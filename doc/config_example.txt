@@ -1,3 +1,4 @@
+
 tempX=1e-3                          # plasma electron temperature along X
 tempY=1e-3                          # plasma electron temperature along Y
 tempZ=1e-3                          # plasma electron temperature along Z
