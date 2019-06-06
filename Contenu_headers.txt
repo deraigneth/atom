@@ -1,7 +1,7 @@
 ------------------------> Properties.h :
-
+*** classe Properties (permet de recuperer les propriétés du plasma à partir d'un fichier texte comme config_example.txt avec fonction getProperty)
 ------------------------> Plasma.h :
-
+*** classe Plasma 
           ------------------------> mpi_shortcut.h :
 
           ------------------------> service_functions.h :
@@ -21,9 +21,10 @@
           ------------------------> NetCdf/NetCdfData.h :
 
           ------------------------> PlasmaInitializer.h :
+          *** classe PlasmaInitializer
 
           ------------------------> Plasmatypes.h :
-          Contient la définition de la structure PlasmaConfig
+          *** structure PlasmaConfig
 
                     ------------------------> gpucells.h :
 
