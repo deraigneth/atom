@@ -1,7 +1,11 @@
 ------------------------> Properties.h :
-*** classe Properties (permet de recuperer les propriétés du plasma à partir d'un fichier texte comme config_example.txt avec fonction getProperty)
+
+*** Contient la classe properties
+*** Permet de lire les données dans un fichier texte et de les retourner une par une avec la fonction "getProperty"
+
+
 ------------------------> Plasma.h :
-*** classe Plasma 
+*** classe Plasma
           ------------------------> mpi_shortcut.h :
 
           ------------------------> service_functions.h :
@@ -24,9 +28,12 @@
           *** classe PlasmaInitializer
 
           ------------------------> Plasmatypes.h :
+          
           *** structure PlasmaConfig
 
+
                     ------------------------> gpucells.h :
+                    *** Contient la classe GPUcell, fille de la classe Cell
 
                             ------------------------> cell.h :
 
@@ -35,6 +42,7 @@
                                         ------------------------> particle.h :
 
                                         ------------------------> archAPI.h :
+                                        *** Contient les structures uint3 et dim3 et les fonctions utiles pour les sauvegardes en mémoire
 
 
                     ------------------------> maxwell.h :
