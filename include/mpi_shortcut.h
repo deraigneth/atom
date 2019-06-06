@@ -14,12 +14,16 @@
 
 
 int InitMPI(int argc,char *argv[]);
+// Initialize the MPI execution environment
+
 
 int sumMPI(int size,double *jx,double *jy,double *jz);
+
 
 int sumMPIenergy(double *e);
 
 int CloseMPI();
+// Close the MPI
 
 int getRank();
 
