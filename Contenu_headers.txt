@@ -1,4 +1,6 @@
 ------------------------> Properties.h :
+*** Contient la classe properties 
+*** Permet de lire les données dans un fichier texte et de les retourner une par une avec la fonction "getProperty"
 
 ------------------------> Plasma.h :
 
@@ -23,7 +25,7 @@
           ------------------------> PlasmaInitializer.h :
 
           ------------------------> Plasmatypes.h :
-          Contient la définition de la structure PlasmaConfig
+          *** Contient la définition de la structure PlasmaConfig
 
                     ------------------------> gpucells.h :
                     *** Contient la classe GPUcell, fille de la classe Cell

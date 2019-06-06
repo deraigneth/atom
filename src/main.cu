@@ -11,10 +11,16 @@
 using namespace std;
 
 void printHelp();
+// affichage inutile
 PlasmaConfig initConfig(std::ifstream &is);
+// initialise la structure plasmaconfig avec les données du fichier d'entréenu
 void deinitConfig(PlasmaConfig& config);
-
+// Définition de fonction
 bool isFileExist(const char *);
+// Définition de fonction
+
+
+
 
 int main(int argc, char *argv[]) {
     Plasma *plasma;
@@ -53,6 +59,7 @@ int main(int argc, char *argv[]) {
             std::cerr << "Check file: " << conf.checkFile << " does not exist" << std::endl;
             return -1;
         }
+        // Ici, on a réussi à ouvrir le fichier entré en paramètre dans la ligne de commande d'exécution
 
         InitMPI(argc, argv);
 
