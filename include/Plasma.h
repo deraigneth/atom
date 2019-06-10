@@ -12,8 +12,8 @@
 #include "load_data.h"
 #include "gpucell.h"
 #include "kernels.h"
-#include "NetCdf/read_file.h"
-#include "NetCdf/NetCdfData.h"
+#include
+
 #include "PlasmaTypes.h"
 #include "PlasmaInitializer.h"
 #include "archAPI.h"
