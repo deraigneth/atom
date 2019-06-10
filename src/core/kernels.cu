@@ -29,6 +29,8 @@ __global__ void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, d
     cuda_atomicAdd(d_ee, t);
 }
 
+void getCellEnergy()
+
 __global__ void GPU_SetAllCurrentsToZero(GPUCell **cells) {
     unsigned int nx = blockIdx.x;
     unsigned int ny = blockIdx.y;
