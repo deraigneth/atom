@@ -44,10 +44,13 @@ typedef struct dim3 dim3;
 const char *getErrorString(int err);
 
 int MemoryCopy(void* dst,void *src,size_t size,int dir);
+/* fonction qui utilise les fonctions de mémoire de cuda en fonction de la direction (host to host,...) si cuda est défini*/
 
 int MemoryAllocate(void** dst,size_t size);
+/* fonction qui utilise cudaMalloc*/
 
 int getLastError();
+/* fonction qui utilise cudaGetLasterror*/
 
 int memory_monitor(std::string);
 
