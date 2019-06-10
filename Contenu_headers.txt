@@ -5,22 +5,22 @@
 
 
 ------------------------> Plasma.h :
-*** classe Plasma
+*** classe Plasma permettant de modéliser le plasma avec le fichier et de commencer à écrire dans les fichiers de data (en sortie de fonction)
           ------------------------> mpi_shortcut.h :
-
+          *** Contient des fonctions sur le MPI qui sont déjà codées sur C++ permettant d'effectuer des exécutions parallèles sur des systèmes à mémoire distribuée
           ------------------------> service_functions.h :
-
+          *** Permet de stocker les données (Lesquelles?) dans le GPU avec des malloc2D et malloc3D
           ------------------------> load_data.h :
           *** Lit les données des particules
 
           ------------------------> gpucells.h :
 
           ------------------------> kernels.h :
-
+          *** Contient l'ensemble des kernels qui s'exécutent sur le GPU
           ------------------------> archAPI.h :
-
+          *** Permet de faire le lien avec le hardware (ici GPU) et de faire les cudaMalloc
           ------------------------> maxwell.h :
-
+          *** Contient l'ensemble des fonctions relatives aux particules -> c'est de la PHYSIQUE
           ------------------------> NetCdf/read_file.h :
 
           ------------------------> NetCdf/NetCdfData.h :
@@ -29,7 +29,7 @@
           *** classe PlasmaInitializer
 
           ------------------------> Plasmatypes.h :
-          
+
           *** structure PlasmaConfig
 
 

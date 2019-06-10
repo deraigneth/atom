@@ -11,6 +11,19 @@ __device__ double cuda_atomicAdd(double *address, double val) {
     return old;
 }
 
+/////////////////////////////////////////////////////
+///////////////// NEW FUNCTION //////////////////////
+double cuda_atomicAdd2(double *address, double val){
+  double assumed, old = *address ;
+  do {
+    assumed = old ;
+    old = __longlong_as_double(atomicCAS((unsigned long long int *)address, __double_as_longlong(assumed), __double_as_longlong(val + assumed)));
+  } while (assumed != old);
+  return old;
+}
+
+
+
 __global__ void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey, double *d_Ez) {
     unsigned int i = blockIdx.x;
     unsigned int l = blockIdx.y;
@@ -28,6 +41,7 @@ __global__ void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, d
 
     cuda_atomicAdd(d_ee, t);
 }
+
 
 __global__ void GPU_SetAllCurrentsToZero(GPUCell **cells) {
     unsigned int nx = blockIdx.x;
@@ -52,6 +66,9 @@ __global__ void GPU_SetFieldsToCells(GPUCell **cells, double *Ex, double *Ey, do
 
     c->readFieldsFromArrays(Ex, Ey, Ez, Hx, Hy, Hz, threadIdx);
 }
+/////////////////////////////////////////////////////
+///////////////// NEW FUNCTION //////////////////////
+void GPU_SetFieldsToCells()
 
 __global__ void GPU_WriteAllCurrents(GPUCell **cells, int n0, double *jx, double *jy, double *jz, double *rho) {
     unsigned int nx = blockIdx.x;
