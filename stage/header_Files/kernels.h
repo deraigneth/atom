@@ -2,24 +2,24 @@
 #ifndef KERNELS_H_
 #define KERNELS_H_
 
-#include "gpucell.h"
+#include "CPUcell.h"
 #include "archAPI.h"
 
 double cuda_atomicAdd(double *, double);
 
-void GPU_getCellEnergy(GPUCell **, double *, double *, double *, double *);
+void CPU_getCellEnergy(CPUCell **, double *, double *, double *, double *);
 
-void GPU_SetAllCurrentsToZero(GPUCell **);
+void CPU_SetAllCurrentsToZero(CPUCell **);
 
-void GPU_SetFieldsToCells(GPUCell **, double *, double *, double *, double *, double *, double *);
+void CPU_SetFieldsToCells(CPUCell **, double *, double *, double *, double *, double *, double *);
 
-void GPU_WriteAllCurrents(GPUCell **, int, double *, double *, double *, double *);
+void CPU_WriteAllCurrents(CPUCell **, int, double *, double *, double *, double *);
 
-void GPU_WriteControlSystem(Cell **);
+void CPU_WriteControlSystem(Cell **);
 
-void GPU_MakeDepartureLists(GPUCell **, int *);
+void CPU_MakeDepartureLists(CPUCell **, int *);
 
-void GPU_ArrangeFlights(GPUCell **, int *);
+void CPU_ArrangeFlights(CPUCell **, int *);
 
 void writeCurrentComponent(CellDouble *, CurrentTensorComponent *, CurrentTensorComponent *, int);
 
@@ -39,28 +39,28 @@ void AccumulateCurrentWithParticlesInCell(CellDouble *, CellDouble *, CellDouble
 
 void copyFromSharedMemoryToCell(CellDouble *, CellDouble *, CellDouble *, Cell *, int);
 
-void GPU_StepAllCells(GPUCell **);
+void CPU_StepAllCells(CPUCell **);
 
-void GPU_CurrentsAllCells(GPUCell **);
+void CPU_CurrentsAllCells(CPUCell **);
 
 void emh2_Element(Cell *, int, int, int, double *, double *);
 
-void GPU_emh2(GPUCell **, int, int, int, double *, double *);
+void CPU_emh2(CPUCell **, int, int, int, double *, double *);
 
 void emh1_Element(Cell *, int3, double *, double *, double *, double *, double, double, int3, int3);
 
-void GPU_emh1(GPUCell **, double *, double *, double *, double *, double, double, int3, int3);
+void CPU_emh1(CPUCell **, double *, double *, double *, double *, double, double, int3, int3);
 
 void emeElement(Cell *, int3, double *, double *, double *, double *, double, double, double, int3, int3);
 
 void periodicElement(Cell *, int, int, double *, int, int, int);
 
-void GPU_periodic(GPUCell **, int, int, double *, int, int, int);
+void CPU_periodic(CPUCell **, int, int, double *, int, int, int);
 
 void periodicCurrentElement(Cell *, int, int, double *, int, int, int);
 
-void GPU_CurrentPeriodic(GPUCell **, double *, int, int, int, int, int);
+void CPU_CurrentPeriodic(CPUCell **, double *, int, int, int, int, int);
 
-void GPU_eme(GPUCell **, int3, double *, double *, double *, double *, double, double, double, int3, int3);
+void CPU_eme(CPUCell **, int3, double *, double *, double *, double *, double, double, double, int3, int3);
 
 #endif /* KERNELS_H_ */
