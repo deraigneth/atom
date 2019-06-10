@@ -11,6 +11,7 @@
           ------------------------> service_functions.h :
 
           ------------------------> load_data.h :
+          *** Lit les données des particules
 
           ------------------------> gpucells.h :
 
@@ -36,8 +37,10 @@
                     *** Contient la classe GPUcell, fille de la classe Cell
 
                             ------------------------> cell.h :
+                            *** Contient la classe Cell et deux structures (CellDouble et CellTotalField)
 
                                         ------------------------> compare.h :
+                                        *** Contient deux fonctions qui comparent la différence entre deux listes et deux flottants
 
                                         ------------------------> particle.h :
 
@@ -48,12 +51,16 @@
                     ------------------------> maxwell.h :
 
                             ------------------------> particle.h :
+                            *** Contient la classe Particule et deux structures (double3 et Field)
 
                                         ------------------------> particle_types.h :
+                                        *** Contient l'énumération d'une particule (ion, plasma électron, beam électron)
 
                                         ------------------------> tensor.h :
+                                        *** Contient trois classes : CurrentTensorComponent (contient un tableau de 4 lignes 3 colonnes) , CurrentTensor (contient trois CUrrent Tensor Component) , DoubleCurrentTensor (la même chose que CurrentTensor mais pour deux valeurs)
 
                                         ------------------------> run_control.h :
+                                        *** Contient les définitions de certains éléments avec leurs valeurs
 
                             ------------------------> run_control.h :
 
