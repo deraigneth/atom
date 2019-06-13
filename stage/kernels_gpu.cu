@@ -14,7 +14,7 @@ __device__ double atomicAdd_cuda(double *address, double val) {
 
 
 
-__global__ void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey, double *d_Ez) {
+__global__ void getCellEnergy_GPU(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey, double *d_Ez) {
     unsigned int i = blockIdx.x;
     unsigned int l = blockIdx.y;
     unsigned int k = blockIdx.z;
