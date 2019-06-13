@@ -32,7 +32,7 @@ __global__ void getCellEnergy_GPU(GPUCell **cells, double *d_ee, double *d_Ex, d
     atomicAdd_cuda(d_ee, t);
 }
 
-__global__ void GPU_SetAllCurrentsToZero(GPUCell **cells) {
+__global__ void SetAllCurrentsToZero_GPU(GPUCell **cells) {
     unsigned int nx = blockIdx.x;
     unsigned int ny = blockIdx.y;
     unsigned int nz = blockIdx.z;
@@ -83,7 +83,7 @@ __global__ void GPU_WriteAllCurrents(GPUCell **cells, int n0, double *jx, double
     atomicAdd_cuda(&(jz[n]), t);
 }
 
-__global__ void GPU_WriteControlSystem(Cell **cells) {
+__global__ void WriteControlSystem_GPU(Cell **cells) {
     unsigned int nx = blockIdx.x;
     unsigned int ny = blockIdx.y;
     unsigned int nz = blockIdx.z;
@@ -206,7 +206,7 @@ __global__ void GPU_ArrangeFlights(GPUCell **cells, int *d_stage) {
             }
 }
 
-__device__ void writeCurrentComponent(CellDouble *J, CurrentTensorComponent *t1, CurrentTensorComponent *t2, int pqr2) {
+__device__ void writeCurrentComponent_GPU(CellDouble *J, CurrentTensorComponent *t1, CurrentTensorComponent *t2, int pqr2) {
     atomicAdd_cuda(&(J->M[t1->i11][t1->i12][t1->i13]), t1->t[0]);
     atomicAdd_cuda(&(J->M[t1->i21][t1->i22][t1->i23]), t1->t[1]);
     atomicAdd_cuda(&(J->M[t1->i31][t1->i32][t1->i33]), t1->t[2]);
@@ -240,7 +240,7 @@ __device__ void setCellDoubleToZero(CellDouble *dst, unsigned int n) {
     }
 }
 
-__device__ void assignSharedWithLocal(
+__device__ void assignSharedWithLocal_GPU(
         CellDouble **c_jx,
         CellDouble **c_jy,
         CellDouble **c_jz,
@@ -322,7 +322,7 @@ __device__ void set_cell_double_arrays_to_zero(
 
 }
 
-__device__ void MoveParticlesInCell(Cell *c, int index, int blockDimX) {
+__device__ void MoveParticlesInCell_GPU(Cell *c, int index, int blockDimX) {
     CellTotalField cf;
 
     while (index < c->number_of_particles) {
@@ -348,10 +348,10 @@ __device__ void AccumulateCurrentWithParticlesInCell(CellDouble *c_jx, CellDoubl
     while (index < c->number_of_particles) {
         c->AccumulateCurrentSingleParticle(index, &pqr2, &dt);
 
-        writeCurrentComponent(c_jx, &(dt.t1.Jx), &(dt.t2.Jx), pqr2);
+        writeCurrentComponent_GPU(c_jx, &(dt.t1.Jx), &(dt.t2.Jx), pqr2);
 
-        writeCurrentComponent(c_jy, &(dt.t1.Jy), &(dt.t2.Jy), pqr2);
-        writeCurrentComponent(c_jz, &(dt.t1.Jz), &(dt.t2.Jz), pqr2);
+        writeCurrentComponent_GPU(c_jy, &(dt.t1.Jy), &(dt.t2.Jy), pqr2);
+        writeCurrentComponent_GPU(c_jz, &(dt.t1.Jz), &(dt.t2.Jz), pqr2);
 
         index += blockDimX;
     }
@@ -376,7 +376,7 @@ __device__ void copyFromSharedMemoryToCell(
     c->busyParticleArray = 0;
 }
 
-__global__ void GPU_StepAllCells(GPUCell **cells) {
+__global__ void StepAllCells_GPU(GPUCell **cells) {
     Cell *c, *c0 = cells[0];
     __shared__
     CellDouble fd[9];
@@ -385,14 +385,14 @@ __global__ void GPU_StepAllCells(GPUCell **cells) {
 
     c = cells[c0->getGlobalCellNumber(blockIdx.x, blockIdx.y, blockIdx.z)];
 
-    assignSharedWithLocal(&c_jx, &c_jy, &c_jz, &c_ex, &c_ey, &c_ez, &c_hx, &c_hy, &c_hz, fd);
+    assignSharedWithLocal_GPU(&c_jx, &c_jy, &c_jz, &c_ex, &c_ey, &c_ez, &c_hx, &c_hy, &c_hz, fd);
 
 
     copyFieldsToSharedMemory(c_jx, c_jy, c_jz, c_ex, c_ey, c_ez, c_hx, c_hy, c_hz, c,
                              threadIdx.x, blockIdx, blockDim.x);
 
 
-    MoveParticlesInCell(c, threadIdx.x, blockDim.x);
+    MoveParticlesInCell_GPU(c, threadIdx.x, blockDim.x);
 
     copyFromSharedMemoryToCell(c_jx, c_jy, c_jz, c, threadIdx.x);
 }
@@ -411,7 +411,7 @@ __global__ void GPU_CurrentsAllCells(GPUCell **cells) {
 
     c = cells[c0->getGlobalCellNumber(blockIdx.x, blockIdx.y, blockIdx.z)];
 
-    assignSharedWithLocal(&c_jx, &c_jy, &c_jz, &c_ex, &c_ey, &c_ez, &c_hx, &c_hy, &c_hz, fd);
+    assignSharedWithLocal_GPU(&c_jx, &c_jy, &c_jz, &c_ex, &c_ey, &c_ez, &c_hx, &c_hy, &c_hz, fd);
 
     copyFieldsToSharedMemory(c_jx, c_jy, c_jz, c_ex, c_ey, c_ez, c_hx, c_hy, c_hz, c, threadIdx.x, blockIdx, blockDim.x);
 
@@ -430,7 +430,7 @@ void emh2_Element(Cell *c, int i, int l, int k, double *Q, double *H) {
 }
 
 __global__
-void GPU_emh2(GPUCell **cells, int i_s, int l_s, int k_s, double *Q, double *H) {
+void emh2_GPU(GPUCell **cells, int i_s, int l_s, int k_s, double *Q, double *H) {
     unsigned int nx = blockIdx.x;
     unsigned int ny = blockIdx.y;
     unsigned int nz = blockIdx.z;
@@ -463,7 +463,7 @@ void GPU_emh1(GPUCell **cells, double *Q, double *H, double *E1, double *E2, dou
 }
 
 __host__ __device__
-void emeElement(Cell *c, int3 i, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2) {
+void emeElement_GPU(Cell *c, int3 i, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2) {
     int n = c->getGlobalCellNumber(i.x, i.y, i.z);
     int n1 = c->getGlobalCellNumber(i.x + d1.x, i.y + d1.y, i.z + d1.z);
     int n2 = c->getGlobalCellNumber(i.x + d2.x, i.y + d2.y, i.z + d2.z);
@@ -487,7 +487,7 @@ __global__ void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int d
 }
 
 __host__ __device__
-void periodicCurrentElement(Cell *c, int i, int k, double *E, int dir, int dirE, int N) {
+void periodicCurrentElement_GPU(Cell *c, int i, int k, double *E, int dir, int dirE, int N) {
     int n1 = c->getGlobalBoundaryCellNumber(i, k, dir, 1);
     int n_Nm1 = c->getGlobalBoundaryCellNumber(i, k, dir, N - 1);
 
@@ -510,7 +510,7 @@ __global__ void GPU_CurrentPeriodic(GPUCell **cells, double *E, int dirE, int di
     unsigned int nx = blockIdx.x;
     unsigned int nz = blockIdx.z;
     Cell *c0 = cells[0];
-    periodicCurrentElement(c0, nx + i_s, nz + k_s, E, dir, dirE, N);
+    periodicCurrentElement_GPU(c0, nx + i_s, nz + k_s, E, dir, dirE, N);
 }
 
 __global__ void GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2) {
@@ -523,5 +523,5 @@ __global__ void GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *
     s.y += ny;
     s.z += nz;
 
-    emeElement(c0, s, E, H1, H2, J, c1, c2, tau, d1, d2);
+    emeElement_GPU(c0, s, E, H1, H2, J, c1, c2, tau, d1, d2);
 }
