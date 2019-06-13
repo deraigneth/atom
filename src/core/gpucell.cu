@@ -190,4 +190,3 @@ GPUCell *GPUCell::allocateCopyCellFromDevice() {
 double GPUCell::compareToCell(Cell &d_src) {
     return Cell::compareToCell(d_src);
 }
-

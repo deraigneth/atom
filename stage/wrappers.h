@@ -54,4 +54,6 @@ int getLastError();
 
 int memory_monitor(std::string);
 
+
+
 #endif /* ARCHAPI_H_ */
