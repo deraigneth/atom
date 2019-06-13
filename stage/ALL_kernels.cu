@@ -4,6 +4,6 @@ double cuda_atomicAdd(double *address, double val) {
 }
 #else
 double cuda_atomicAdd(double *address, double val) {
-  // atomicADD (...)
-  // autre fonction CPU dans le fichier kernels_cpu
+  atomicADD(double *address, double val) ;
 }
+#endif

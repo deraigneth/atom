@@ -1,4 +1,4 @@
-#include "../../include/kernels.h"
+#include "kernel_gpu.h"
 
 __device__ double atomicAdd_cuda(double *address, double val) {
     double assumed, old = *address;
