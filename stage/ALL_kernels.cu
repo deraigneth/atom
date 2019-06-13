@@ -114,7 +114,7 @@ void periodicCurrentElement(Cell *c, int i, int k, double *E, int dir, int dirE,
 void periodicCurrentElement(Cell *c, int i, int k, double *E, int dir, int dirE, int N){
   periodicCurrentElement_CPU(Cell *c, int i, int k, double *E, int dir, int dirE, int N);
 }
-#endif 
+#endif
 
 #ifdef __CUDACC__
 void GPU_SetFieldsToCells(GPUCell **cells, double *Ex, double *Ey, double *Ez, double *Hx, double *Hy, double *Hz){
