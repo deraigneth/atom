@@ -1,6 +1,6 @@
 #include "../../include/kernels.h"
 
-__device__ double cuda_atomicAdd(double *address, double val) {
+__device__ double atomicAdd_cuda(double *address, double val) {
     double assumed, old = *address;
     do {
         assumed = old;
@@ -29,7 +29,7 @@ __global__ void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, d
 
     t = ex * ex + ey * ey + ez * ez;
 
-    cuda_atomicAdd(d_ee, t);
+    atomicAdd_cuda(d_ee, t);
 }
 
 __global__ void GPU_SetAllCurrentsToZero(GPUCell **cells) {
@@ -76,11 +76,11 @@ __global__ void GPU_WriteAllCurrents(GPUCell **cells, int n0, double *jx, double
     t_x = c->Jx->M[i1][l1][k1];
     int3 i3 = c->getCellTripletNumber(n);
 
-    cuda_atomicAdd(&(jx[n]), t_x);
+    atomicAdd_cuda(&(jx[n]), t_x);
     t_y = c->Jy->M[i1][l1][k1];
-    cuda_atomicAdd(&(jy[n]), t_y);
+    atomicAdd_cuda(&(jy[n]), t_y);
     t = c->Jz->M[i1][l1][k1];
-    cuda_atomicAdd(&(jz[n]), t);
+    atomicAdd_cuda(&(jz[n]), t);
 }
 
 __global__ void GPU_WriteControlSystem(Cell **cells) {
@@ -207,16 +207,16 @@ __global__ void GPU_ArrangeFlights(GPUCell **cells, int *d_stage) {
 }
 
 __device__ void writeCurrentComponent(CellDouble *J, CurrentTensorComponent *t1, CurrentTensorComponent *t2, int pqr2) {
-    cuda_atomicAdd(&(J->M[t1->i11][t1->i12][t1->i13]), t1->t[0]);
-    cuda_atomicAdd(&(J->M[t1->i21][t1->i22][t1->i23]), t1->t[1]);
-    cuda_atomicAdd(&(J->M[t1->i31][t1->i32][t1->i33]), t1->t[2]);
-    cuda_atomicAdd(&(J->M[t1->i41][t1->i42][t1->i43]), t1->t[3]);
+    atomicAdd_cuda(&(J->M[t1->i11][t1->i12][t1->i13]), t1->t[0]);
+    atomicAdd_cuda(&(J->M[t1->i21][t1->i22][t1->i23]), t1->t[1]);
+    atomicAdd_cuda(&(J->M[t1->i31][t1->i32][t1->i33]), t1->t[2]);
+    atomicAdd_cuda(&(J->M[t1->i41][t1->i42][t1->i43]), t1->t[3]);
 
     if (pqr2 == 2) {
-        cuda_atomicAdd(&(J->M[t2->i11][t2->i12][t2->i13]), t2->t[0]);
-        cuda_atomicAdd(&(J->M[t2->i21][t2->i22][t2->i23]), t2->t[1]);
-        cuda_atomicAdd(&(J->M[t2->i31][t2->i32][t2->i33]), t2->t[2]);
-        cuda_atomicAdd(&(J->M[t2->i41][t2->i42][t2->i43]), t2->t[3]);
+        atomicAdd_cuda(&(J->M[t2->i11][t2->i12][t2->i13]), t2->t[0]);
+        atomicAdd_cuda(&(J->M[t2->i21][t2->i22][t2->i23]), t2->t[1]);
+        atomicAdd_cuda(&(J->M[t2->i31][t2->i32][t2->i33]), t2->t[2]);
+        atomicAdd_cuda(&(J->M[t2->i41][t2->i42][t2->i43]), t2->t[3]);
     }
 }
 
