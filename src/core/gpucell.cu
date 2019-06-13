@@ -36,7 +36,6 @@ GPUCell *GPUCell::copyCellToDevice() {
 
     err = cudaMalloc((void **) &(h_src->doubParticleArray), sizeof(Particle) * MAX_particles_per_cell);
     CHECK_ERROR("", err);
-
     err = cudaMemset((void **) h_src->doubParticleArray, 0, sizeof(Particle) * MAX_particles_per_cell);
     CHECK_ERROR("", err);
 
@@ -190,4 +189,3 @@ GPUCell *GPUCell::allocateCopyCellFromDevice() {
 double GPUCell::compareToCell(Cell &d_src) {
     return Cell::compareToCell(d_src);
 }
-
