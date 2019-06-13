@@ -1,6 +1,6 @@
 #include "kernel_gpu.h"
 
-__device__ double atomicAdd_cuda(double *address, double val) {
+__device__ double atomicAdd_GPU(double *address, double val) {
     double assumed, old = *address;
     do {
         assumed = old;
@@ -21,7 +21,7 @@ __global__ void getCellEnergy_GPU(GPUCell **cells, double *d_ee, double *d_Ex, d
     Cell *c0 = cells[0], nc;
     double t, ex, ey, ez;
 
-    int n = c0->getGlobalCellNumber(i, l, k);
+    int n = c0->getGlobalCellNumber(i, l, k); //getGlobalCellNumber en cuda dans cell.h
 
     ex = d_Ex[n];
     ey = d_Ey[n];
@@ -29,7 +29,7 @@ __global__ void getCellEnergy_GPU(GPUCell **cells, double *d_ee, double *d_Ex, d
 
     t = ex * ex + ey * ey + ez * ez;
 
-    atomicAdd_cuda(d_ee, t);
+    atomicAdd_GPU(d_ee, t);
 }
 
 __global__ void SetAllCurrentsToZero_GPU(GPUCell **cells) {
@@ -45,7 +45,7 @@ __global__ void SetAllCurrentsToZero_GPU(GPUCell **cells) {
     nc.SetAllCurrentsToZero(threadIdx);
 }
 
-__global__ void GPU_SetFieldsToCells(GPUCell **cells, double *Ex, double *Ey, double *Ez, double *Hx, double *Hy, double *Hz) {
+__global__ void SetFieldsToCells_GPU(GPUCell **cells, double *Ex, double *Ey, double *Ez, double *Hx, double *Hy, double *Hz) {
     unsigned int nx = blockIdx.x;
     unsigned int ny = blockIdx.y;
     unsigned int nz = blockIdx.z;
@@ -57,7 +57,7 @@ __global__ void GPU_SetFieldsToCells(GPUCell **cells, double *Ex, double *Ey, do
 }
 
 
-__global__ void GPU_WriteAllCurrents(GPUCell **cells, int n0, double *jx, double *jy, double *jz, double *rho) {
+__global__ void writeAllCurrents_GPU(GPUCell **cells, int n0, double *jx, double *jy, double *jz, double *rho) {
     unsigned int nx = blockIdx.x;
     unsigned int ny = blockIdx.y;
     unsigned int nz = blockIdx.z;
@@ -76,11 +76,11 @@ __global__ void GPU_WriteAllCurrents(GPUCell **cells, int n0, double *jx, double
     t_x = c->Jx->M[i1][l1][k1];
     int3 i3 = c->getCellTripletNumber(n);
 
-    atomicAdd_cuda(&(jx[n]), t_x);
+    atomicAdd_GPU(&(jx[n]), t_x);
     t_y = c->Jy->M[i1][l1][k1];
-    atomicAdd_cuda(&(jy[n]), t_y);
+    atomicAdd_GPU(&(jy[n]), t_y);
     t = c->Jz->M[i1][l1][k1];
-    atomicAdd_cuda(&(jz[n]), t);
+    atomicAdd_GPU(&(jz[n]), t);
 }
 
 __global__ void WriteControlSystem_GPU(Cell **cells) {
@@ -104,7 +104,7 @@ __global__ void WriteControlSystem_GPU(Cell **cells) {
 //            E. 4th to write arriving particles
 
 
-__global__ void GPU_MakeDepartureLists(GPUCell **cells, int *d_stage) {
+__global__ void MakeDepartureLists_GPU(GPUCell **cells, int *d_stage) {
     unsigned int nx = blockIdx.x;
     unsigned int ny = blockIdx.y;
     unsigned int nz = blockIdx.z;
@@ -166,7 +166,7 @@ __global__ void GPU_MakeDepartureLists(GPUCell **cells, int *d_stage) {
     }
 }
 
-__global__ void GPU_ArrangeFlights(GPUCell **cells, int *d_stage) {
+__global__ void arrangeFlights_GPU(GPUCell **cells, int *d_stage) {
     unsigned int nx = blockIdx.x;
     unsigned int ny = blockIdx.y;
     unsigned int nz = blockIdx.z;
@@ -206,21 +206,29 @@ __global__ void GPU_ArrangeFlights(GPUCell **cells, int *d_stage) {
             }
 }
 
+<<<<<<< HEAD
 __device__ void writeCurrentComponent_GPU(CellDouble *J, CurrentTensorComponent *t1, CurrentTensorComponent *t2, int pqr2) {
     atomicAdd_cuda(&(J->M[t1->i11][t1->i12][t1->i13]), t1->t[0]);
     atomicAdd_cuda(&(J->M[t1->i21][t1->i22][t1->i23]), t1->t[1]);
     atomicAdd_cuda(&(J->M[t1->i31][t1->i32][t1->i33]), t1->t[2]);
     atomicAdd_cuda(&(J->M[t1->i41][t1->i42][t1->i43]), t1->t[3]);
+=======
+__device__ void writeCurrentComponent(CellDouble *J, CurrentTensorComponent *t1, CurrentTensorComponent *t2, int pqr2) {
+    atomicAdd_GPU(&(J->M[t1->i11][t1->i12][t1->i13]), t1->t[0]);
+    atomicAdd_GPU(&(J->M[t1->i21][t1->i22][t1->i23]), t1->t[1]);
+    atomicAdd_GPU(&(J->M[t1->i31][t1->i32][t1->i33]), t1->t[2]);
+    atomicAdd_GPU(&(J->M[t1->i41][t1->i42][t1->i43]), t1->t[3]);
+>>>>>>> 36d9e9ebe30738b59a85abbaf52a66559833b83b
 
     if (pqr2 == 2) {
-        atomicAdd_cuda(&(J->M[t2->i11][t2->i12][t2->i13]), t2->t[0]);
-        atomicAdd_cuda(&(J->M[t2->i21][t2->i22][t2->i23]), t2->t[1]);
-        atomicAdd_cuda(&(J->M[t2->i31][t2->i32][t2->i33]), t2->t[2]);
-        atomicAdd_cuda(&(J->M[t2->i41][t2->i42][t2->i43]), t2->t[3]);
+        atomicAdd_GPU(&(J->M[t2->i11][t2->i12][t2->i13]), t2->t[0]);
+        atomicAdd_GPU(&(J->M[t2->i21][t2->i22][t2->i23]), t2->t[1]);
+        atomicAdd_GPU(&(J->M[t2->i31][t2->i32][t2->i33]), t2->t[2]);
+        atomicAdd_GPU(&(J->M[t2->i41][t2->i42][t2->i43]), t2->t[3]);
     }
 }
 
-__device__ void copyCellDouble(CellDouble *dst, CellDouble *src, unsigned int n) {
+__device__ void copyCellDouble_GPU(CellDouble *dst, CellDouble *src, unsigned int n) {
     if (n < CellExtent * CellExtent * CellExtent) {
         double *d_dst, *d_src;//,t;
 
@@ -231,7 +239,7 @@ __device__ void copyCellDouble(CellDouble *dst, CellDouble *src, unsigned int n)
     }
 }
 
-__device__ void setCellDoubleToZero(CellDouble *dst, unsigned int n) {
+__device__ void setCellDoubleToZero_GPU(CellDouble *dst, unsigned int n) {
     if (n < CellExtent * CellExtent * CellExtent) {
         double *d_dst;
 
@@ -263,7 +271,7 @@ __device__ void assignSharedWithLocal_GPU(
     *c_jy = &(fd[7]);
     *c_jz = &(fd[8]);
 }
-__device__ void copyFieldsToSharedMemory(
+__device__ void copyFieldsToSharedMemory_GPU(
         CellDouble *c_jx,
         CellDouble *c_jy,
         CellDouble *c_jz,
@@ -281,17 +289,17 @@ __device__ void copyFieldsToSharedMemory(
 
     while (index < CellExtent * CellExtent * CellExtent) {
 
-        copyCellDouble(c_ex, c->Ex, index);
-        copyCellDouble(c_ey, c->Ey, index);
-        copyCellDouble(c_ez, c->Ez, index);
+        copyCellDouble_GPU(c_ex, c->Ex, index);
+        copyCellDouble_GPU(c_ey, c->Ey, index);
+        copyCellDouble_GPU(c_ez, c->Ez, index);
 
-        copyCellDouble(c_hx, c->Hx, index);
-        copyCellDouble(c_hy, c->Hy, index);
-        copyCellDouble(c_hz, c->Hz, index);
+        copyCellDouble_GPU(c_hx, c->Hx, index);
+        copyCellDouble_GPU(c_hy, c->Hy, index);
+        copyCellDouble_GPU(c_hz, c->Hz, index);
 
-        copyCellDouble(c_jx, c->Jx, index);
-        copyCellDouble(c_jy, c->Jy, index);
-        copyCellDouble(c_jz, c->Jz, index);
+        copyCellDouble_GPU(c_jx, c->Jx, index);
+        copyCellDouble_GPU(c_jy, c->Jy, index);
+        copyCellDouble_GPU(c_jz, c->Jz, index);
         index += blockDimX;
     }
 
@@ -299,7 +307,7 @@ __device__ void copyFieldsToSharedMemory(
 
 }
 
-__device__ void set_cell_double_arrays_to_zero(
+__device__ void set_cell_double_arrays_to_zero_GPU(
         CellDouble *m_c_jx,
         CellDouble *m_c_jy,
         CellDouble *m_c_jz,
@@ -308,9 +316,9 @@ __device__ void set_cell_double_arrays_to_zero(
         int blockDimX
 ) {
     for (int i = 0; i < size; i++) {
-        setCellDoubleToZero(&(m_c_jx[i]), index);
-        setCellDoubleToZero(&(m_c_jy[i]), index);
-        setCellDoubleToZero(&(m_c_jz[i]), index);
+        setCellDoubleToZero_GPU(&(m_c_jx[i]), index);
+        setCellDoubleToZero_GPU(&(m_c_jy[i]), index);
+        setCellDoubleToZero_GPU(&(m_c_jz[i]), index);
     }
 
     while (index < CellExtent * CellExtent * CellExtent) {
@@ -341,7 +349,7 @@ __device__ void MoveParticlesInCell_GPU(Cell *c, int index, int blockDimX) {
     __syncthreads();
 }
 
-__device__ void AccumulateCurrentWithParticlesInCell(CellDouble *c_jx, CellDouble *c_jy, CellDouble *c_jz, Cell *c, int index, int blockDimX) {
+__device__ void AccumulateCurrentWithParticlesInCell_GPU(CellDouble *c_jx, CellDouble *c_jy, CellDouble *c_jz, Cell *c, int index, int blockDimX) {
     DoubleCurrentTensor dt;
     int pqr2;
 
@@ -359,7 +367,7 @@ __device__ void AccumulateCurrentWithParticlesInCell(CellDouble *c_jx, CellDoubl
 
 }
 
-__device__ void copyFromSharedMemoryToCell(
+__device__ void copyFromSharedMemoryToCell_GPU(
         CellDouble *c_jx,
         CellDouble *c_jy,
         CellDouble *c_jz,
@@ -367,9 +375,9 @@ __device__ void copyFromSharedMemoryToCell(
         int index
 ) {
     while (index < CellExtent * CellExtent * CellExtent) {
-        copyCellDouble(c->Jx, c_jx, index);
-        copyCellDouble(c->Jy, c_jy, index);
-        copyCellDouble(c->Jz, c_jz, index);
+        copyCellDouble_GPU(c->Jx, c_jx, index);
+        copyCellDouble_GPU(c->Jy, c_jy, index);
+        copyCellDouble_GPU(c->Jz, c_jz, index);
 
         index += blockDim.x;
     }
@@ -388,16 +396,16 @@ __global__ void StepAllCells_GPU(GPUCell **cells) {
     assignSharedWithLocal_GPU(&c_jx, &c_jy, &c_jz, &c_ex, &c_ey, &c_ez, &c_hx, &c_hy, &c_hz, fd);
 
 
-    copyFieldsToSharedMemory(c_jx, c_jy, c_jz, c_ex, c_ey, c_ez, c_hx, c_hy, c_hz, c,
+    copyFieldsToSharedMemory_GPU(c_jx, c_jy, c_jz, c_ex, c_ey, c_ez, c_hx, c_hy, c_hz, c,
                              threadIdx.x, blockIdx, blockDim.x);
 
 
     MoveParticlesInCell_GPU(c, threadIdx.x, blockDim.x);
 
-    copyFromSharedMemoryToCell(c_jx, c_jy, c_jz, c, threadIdx.x);
+    copyFromSharedMemoryToCell_GPU(c_jx, c_jy, c_jz, c, threadIdx.x);
 }
 
-__global__ void GPU_CurrentsAllCells(GPUCell **cells) {
+__global__ void CurrentsAllCells_GPU(GPUCell **cells) {
     Cell *c, *c0 = cells[0];
     __shared__
     CellDouble fd[9];
@@ -413,17 +421,17 @@ __global__ void GPU_CurrentsAllCells(GPUCell **cells) {
 
     assignSharedWithLocal_GPU(&c_jx, &c_jy, &c_jz, &c_ex, &c_ey, &c_ez, &c_hx, &c_hy, &c_hz, fd);
 
-    copyFieldsToSharedMemory(c_jx, c_jy, c_jz, c_ex, c_ey, c_ez, c_hx, c_hy, c_hz, c, threadIdx.x, blockIdx, blockDim.x);
+    copyFieldsToSharedMemory_GPU(c_jx, c_jy, c_jz, c_ex, c_ey, c_ez, c_hx, c_hy, c_hz, c, threadIdx.x, blockIdx, blockDim.x);
 
-    set_cell_double_arrays_to_zero(m_c_jx, m_c_jy, m_c_jz, CURRENT_SUM_BUFFER_LENGTH, threadIdx.x, blockDim.x);
+    set_cell_double_arrays_to_zero_GPU(m_c_jx, m_c_jy, m_c_jz, CURRENT_SUM_BUFFER_LENGTH, threadIdx.x, blockDim.x);
 
-    AccumulateCurrentWithParticlesInCell(c_jx, c_jy, c_jz, c, threadIdx.x, blockDim.x);
+    AccumulateCurrentWithParticlesInCell_GPU(c_jx, c_jy, c_jz, c, threadIdx.x, blockDim.x);
 
-    copyFromSharedMemoryToCell(c_jx, c_jy, c_jz, c, threadIdx.x);
+    copyFromSharedMemoryToCell_GPU(c_jx, c_jy, c_jz, c, threadIdx.x);
 }
 
 __host__ __device__
-void emh2_Element(Cell *c, int i, int l, int k, double *Q, double *H) {
+void emh2_Element_GPU(Cell *c, int i, int l, int k, double *Q, double *H) {
     int n = c->getGlobalCellNumber(i, l, k);
 
     H[n] += Q[n];
@@ -436,11 +444,11 @@ void emh2_GPU(GPUCell **cells, int i_s, int l_s, int k_s, double *Q, double *H) 
     unsigned int nz = blockIdx.z;
     Cell *c0 = cells[0];
 
-    emh2_Element(c0, i_s + nx, l_s + ny, k_s + nz, Q, H);
+    emh2_Element_GPU(c0, i_s + nx, l_s + ny, k_s + nz, Q, H);
 }
 
 __host__ __device__
-void emh1_Element(Cell *c, int3 i, double *Q, double *H, double *E1, double *E2, double c1, double c2, int3 d1, int3 d2) {
+void emh1_Element_GPU(Cell *c, int3 i, double *Q, double *H, double *E1, double *E2, double c1, double c2, int3 d1, int3 d2) {
     int n = c->getGlobalCellNumber(i.x, i.y, i.z);
     int n1 = c->getGlobalCellNumber(i.x + d1.x, i.y + d1.y, i.z + d1.z);
     int n2 = c->getGlobalCellNumber(i.x + d2.x, i.y + d2.y, i.z + d2.z);
@@ -456,10 +464,10 @@ void emh1_Element(Cell *c, int3 i, double *Q, double *H, double *E1, double *E2,
 }
 
 __global__
-void GPU_emh1(GPUCell **cells, double *Q, double *H, double *E1, double *E2, double c1, double c2, int3 d1, int3 d2) {
+void emh1_GPU(GPUCell **cells, double *Q, double *H, double *E1, double *E2, double c1, double c2, int3 d1, int3 d2) {
     int3 i3 = make_int3(blockIdx.x, blockIdx.y, blockIdx.z);
     Cell *c0 = cells[0];
-    emh1_Element(c0, i3, Q, H, E1, E2, c1, c2, d1, d2);
+    emh1_Element_GPU(c0, i3, Q, H, E1, E2, c1, c2, d1, d2);
 }
 
 __host__ __device__
@@ -472,7 +480,7 @@ void emeElement_GPU(Cell *c, int3 i, double *E, double *H1, double *H2, double *
 }
 
 __host__ __device__
-void periodicElement(Cell *c, int i, int k, double *E, int dir, int to, int from) {
+void periodicElement_GPU(Cell *c, int i, int k, double *E, int dir, int to, int from) {
     int n = c->getGlobalBoundaryCellNumber(i, k, dir, to);
     int n1 = c->getGlobalBoundaryCellNumber(i, k, dir, from);
     E[n] = E[n1];
@@ -483,7 +491,7 @@ __global__ void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int d
     unsigned int nz = blockIdx.z;
     Cell *c0 = cells[0];
 
-    periodicElement(c0, nx + i_s, nz + k_s, E, dir, to, from);
+    periodicElement_GPU(c0, nx + i_s, nz + k_s, E, dir, to, from);
 }
 
 __host__ __device__
@@ -506,7 +514,7 @@ void periodicCurrentElement_GPU(Cell *c, int i, int k, double *E, int dir, int d
     E[n_Nm2] = E[n0];
 }
 
-__global__ void GPU_CurrentPeriodic(GPUCell **cells, double *E, int dirE, int dir, int i_s, int k_s, int N) {
+__global__ void CurrentPeriodic_GPU(GPUCell **cells, double *E, int dirE, int dir, int i_s, int k_s, int N) {
     unsigned int nx = blockIdx.x;
     unsigned int nz = blockIdx.z;
     Cell *c0 = cells[0];
