@@ -4,11 +4,9 @@
 #include "../include/gpucell.h"
 #include "../include/archAPI.h"
 
-<<<<<<< HEAD
 
-=======
 __device__ double atomicAdd_GPU(double *, double);
->>>>>>> 36d9e9ebe30738b59a85abbaf52a66559833b83b
+
 
 __global__ void getCellEnergy_GPU(GPUCell **, double *, double *, double *, double *);
 
