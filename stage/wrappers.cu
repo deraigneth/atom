@@ -29,6 +29,7 @@ int MemoryAllocate(void **dst, size_t size) {
 }
 #endif
 
+
 #ifdef __CUDACC__
 int getLastError() {
     return (int)cudaGetLastError();

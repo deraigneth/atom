@@ -32,6 +32,7 @@ struct dim3 {
 #endif /* __cplusplus */
 };
 
+
 typedef struct dim3 dim3;
 
 #define __device__

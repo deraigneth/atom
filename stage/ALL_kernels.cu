@@ -31,6 +31,7 @@ void writeCurrentComponent(CellDouble *J, CurrentTensorComponent *t1, CurrentTen
 }
 #endif
 
+
 #ifdef __CUDACC__
 void assignSharedWithLocal(CellDouble **c_jx, CellDouble **c_jy, CellDouble **c_jz, CellDouble **c_ex, CellDouble **c_ey, CellDouble **c_ez, CellDouble **c_hx, CellDouble **c_hy, CellDouble **c_hz, CellDouble *fd){
            assignSharedWithLocal_GPU(**c_jx, **c_jy, **c_jz, **c_ex, **c_ey, **c_ez, **c_hx, **c_hy, **c_hz, *fd);

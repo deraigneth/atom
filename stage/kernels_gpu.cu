@@ -33,6 +33,7 @@ __global__ void getCellEnergy_GPU(GPUCell **cells, double *d_ee, double *d_Ex, d
     atomicAdd_GPU(d_ee, t);
 }
 
+
 __global__ void SetAllCurrentsToZero_GPU(GPUCell **cells) {
     unsigned int nx = blockIdx.x;
     unsigned int ny = blockIdx.y;

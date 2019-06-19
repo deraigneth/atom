@@ -21,6 +21,7 @@ void periodicCurrentElement_CPU(Cell *, int, int, double *, int, int, int);
 double atomicADD_CPU(double *, double ) ;
 
 
+
 void SetFieldsToCells_CPU(GPUCell **, double *, double *, double *, double *, double *, double *) ;
 
 void MakeDepartureLists_CPU(GPUCell **, int *) ;

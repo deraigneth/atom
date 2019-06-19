@@ -26,6 +26,7 @@ __device__ void writeCurrentComponent_GPU(CellDouble *, CurrentTensorComponent *
 
 __device__ void copyCellDouble_GPU(CellDouble *, CellDouble *, unsigned int);
 
+
 __device__ void setCellDoubleToZero_GPU(CellDouble *, unsigned int);
 
 __device__ void assignSharedWithLocal_GPU(CellDouble **, CellDouble **, CellDouble **, CellDouble **, CellDouble **, CellDouble **, CellDouble **, CellDouble **, CellDouble **, CellDouble *);
