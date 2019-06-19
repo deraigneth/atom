@@ -57,9 +57,16 @@ void emeElement_CPU(Cell *c, int3 i, double *E, double *H1, double *H2, double *
 void periodicCurrentElement_CPU(Cell *c, int i, int k, double *E, int dir, int dirE, int N) {
 
 
-
+}
 void SetFieldsToCells_CPU(GPUCell **cells, double *Ex, double *Ey, double *Ez, double *Hx, double *Hy, double *Hz){
+  Cell *c, *c0 = cells[0] ;
+  for (int i = 0;i<dimGrid.x ){
+    for (int j = 0 ; ){
+      for (int w = 0 ; ){
 
+      }
+    }
+  }
 }
 
 void MakeDepartureLists_CPU(GPUCell **cells, int *d_stage){
