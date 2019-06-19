@@ -56,12 +56,12 @@ __host__ __device__ void emeElement_GPU(Cell *, int3, double *, double *, double
 
 __host__ __device__ void periodicElement_GPU(Cell *, int, int, double *, int, int, int);
 
-__global__ void GPU_periodic(GPUCell **, int, int, double *, int, int, int);
+__global__ void periodic_GPU(GPUCell **, int, int, double *, int, int, int);
 
 __host__ __device__ void periodicCurrentElement_GPU(Cell *, int, int, double *, int, int, int);
 
 __global__ void CurrentPeriodic_GPU(GPUCell **, double *, int, int, int, int, int);
 
-__global__ void GPU_eme(GPUCell **, int3, double *, double *, double *, double *, double, double, double, int3, int3);
+__global__ void eme_GPU(GPUCell **, int3, double *, double *, double *, double *, double, double, double, int3, int3);
 
 #endif /* KERNELS_H_ */

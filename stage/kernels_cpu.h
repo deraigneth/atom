@@ -62,3 +62,7 @@ void emh2_Element_CPU(Cell *, int , int , int , double *, double *);
 void emh1_CPU(GPUCell **, double *, double *, double *, double *, double , double , int3 , int3 );
 
 void periodicCurrentElement_CPU(Cell *, int , int , double *, int , int , int );
+
+void periodic_CPU(GPUCell**, int , int , double *, int , int , int );
+
+void  eme_CPU(**cells,  s,  *E,  *H1,  *H2,  *J,  c1,  c2,  tau,  d1,  d2);

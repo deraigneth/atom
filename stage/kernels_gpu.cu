@@ -1,3 +1,4 @@
+
 #include "kernel_gpu.h"
 
 __device__ double atomicAdd_GPU(double *address, double val) {
@@ -485,7 +486,7 @@ void periodicElement_GPU(Cell *c, int i, int k, double *E, int dir, int to, int 
     E[n] = E[n1];
 }
 
-__global__ void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from) {
+__global__ void periodic_GPU(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from) {
     unsigned int nx = blockIdx.x;
     unsigned int nz = blockIdx.z;
     Cell *c0 = cells[0];
@@ -493,8 +494,7 @@ __global__ void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int d
     periodicElement_GPU(c0, nx + i_s, nz + k_s, E, dir, to, from);
 }
 
-__host__ __device__
-void periodicCurrentElement_GPU(Cell *c, int i, int k, double *E, int dir, int dirE, int N) {
+__host__ __device__ void periodicCurrentElement_GPU(Cell *c, int i, int k, double *E, int dir, int dirE, int N) {
     int n1 = c->getGlobalBoundaryCellNumber(i, k, dir, 1);
     int n_Nm1 = c->getGlobalBoundaryCellNumber(i, k, dir, N - 1);
 
@@ -520,7 +520,7 @@ __global__ void CurrentPeriodic_GPU(GPUCell **cells, double *E, int dirE, int di
     periodicCurrentElement_GPU(c0, nx + i_s, nz + k_s, E, dir, dirE, N);
 }
 
-__global__ void GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2) {
+__global__ void eme_GPU(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2) {
     unsigned int nx = blockIdx.x * blockDim.x + threadIdx.x;
     unsigned int ny = blockIdx.y * blockDim.y + threadIdx.y;
     unsigned int nz = blockIdx.z * blockDim.z + threadIdx.z;

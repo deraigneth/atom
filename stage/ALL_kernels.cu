@@ -345,6 +345,7 @@ void periodicElement(Cell *c, int i, int k, double *E, int dir, int to, int from
 void periodicElement(Cell *c, int i, int k, double *E, int dir, int to, int from){
   periodicElement_CPU( *c,  i,  k,  *E,  dir,  to,  from);
 }
+#endif
 
 #ifdef __CUDACC__
 void GPU_CurrentPeriodic(GPUCell **cells, double *E, int dirE, int dir, int i_s, int k_s, int N){
@@ -354,3 +355,24 @@ void GPU_CurrentPeriodic(GPUCell **cells, double *E, int dirE, int dir, int i_s,
 void GPU_CurrentPeriodic(GPUCell **cells, double *E, int dirE, int dir, int i_s, int k_s, int N){
   CurrentPeriodic_CPU( **cells,  *E,  dirE,  dir,  i_s,  k_s,  N);
 }
+#endif
+
+#ifdef __CUDACC__
+void  GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2){
+  eme_GPU( **cells,  s,  *E,  *H1,  *H2,  *J,  c1,  c2,  tau,  d1,  d2);
+}
+#else
+void  GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2){
+  eme_CPU(**cells,  s,  *E,  *H1,  *H2,  *J,  c1,  c2,  tau,  d1,  d2);
+}
+#endif
+
+#ifdef __CUDACC__
+void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from){
+  periodic_GPU( **cells,  i_s,  k_s,  *E,  dir,  to,from);
+}
+#else
+void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from){
+  periodic_CPU( **cells,  i_s,  k_s,  *E,  dir,  to,from);
+}
+#endif

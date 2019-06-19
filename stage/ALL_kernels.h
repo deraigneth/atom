@@ -18,8 +18,6 @@ void GPU_emh2(GPUCell **, int , int , int , double *, double *);
 
 void emeElement(Cell *, int3, double *, double *, double *, double *, double, double, double, int3, int3);
 
-void periodicCurrentElement(Cell *, int, int, double *, int, int, int);
-
 double cuda_atomicAdd(double *, double ) ;
 
 void GPU_getCellEnergy(GPUCell **, double *, double *, double *, double *);
@@ -59,8 +57,12 @@ void copyFromSharedMemoryToCell(
         int
 );
 
+void GPU_periodic(GPUCell **, int, int, double *, int, int, int);
+
 void emh2_Element(Cell *, int , int , int , double *, double *);
 
 void GPU_emh1(GPUCell **, double *, double *, double *, double *, double , double , int3 , int3 );
 
 void periodicCurrentElement(Cell *, int , int , double *, int , int , int );
+
+void GPU_eme(GPUCell **, int3, double *, double *, double *, double *, double, double, double, int3, int3);

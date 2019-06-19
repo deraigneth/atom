@@ -156,3 +156,11 @@ void periodicCurrentElement_CPU(Cell *c, int i, int k, double *E, int dir, int d
   //à compléter
 
 }
+
+void periodic_CPU(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from) {
+
+}
+
+void eme_CPU(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2){
+  
+}
