@@ -208,25 +208,21 @@ __global__ void arrangeFlights_GPU(GPUCell **cells, int *d_stage) {
 }
 
 
-__device__ void writeCurrentComponent_GPU(CellDouble *J, CurrentTensorComponent *t1, CurrentTensorComponent *t2, int pqr2) {
-    atomicAdd_cuda(&(J->M[t1->i11][t1->i12][t1->i13]), t1->t[0]);
-    atomicAdd_cuda(&(J->M[t1->i21][t1->i22][t1->i23]), t1->t[1]);
-    atomicAdd_cuda(&(J->M[t1->i31][t1->i32][t1->i33]), t1->t[2]);
-    atomicAdd_cuda(&(J->M[t1->i41][t1->i42][t1->i43]), t1->t[3]);
 
 __device__ void writeCurrentComponent_GPU(CellDouble *J, CurrentTensorComponent *t1, CurrentTensorComponent *t2, int pqr2) {
-    atomicAdd_GPU(&(J->M[t1->i11][t1->i12][t1->i13]), t1->t[0]);
-    atomicAdd_GPU(&(J->M[t1->i21][t1->i22][t1->i23]), t1->t[1]);
-    atomicAdd_GPU(&(J->M[t1->i31][t1->i32][t1->i33]), t1->t[2]);
-    atomicAdd_GPU(&(J->M[t1->i41][t1->i42][t1->i43]), t1->t[3]);
+    cuda_atomicAdd(&(J->M[t1->i11][t1->i12][t1->i13]), t1->t[0]);
+    cuda_atomicAdd(&(J->M[t1->i21][t1->i22][t1->i23]), t1->t[1]);
+    cuda_atomicAdd(&(J->M[t1->i31][t1->i32][t1->i33]), t1->t[2]);
+    cuda_atomicAdd(&(J->M[t1->i41][t1->i42][t1->i43]), t1->t[3]);
 
     if (pqr2 == 2) {
-        atomicAdd_GPU(&(J->M[t2->i11][t2->i12][t2->i13]), t2->t[0]);
-        atomicAdd_GPU(&(J->M[t2->i21][t2->i22][t2->i23]), t2->t[1]);
-        atomicAdd_GPU(&(J->M[t2->i31][t2->i32][t2->i33]), t2->t[2]);
-        atomicAdd_GPU(&(J->M[t2->i41][t2->i42][t2->i43]), t2->t[3]);
+        cuda_atomicAdd(&(J->M[t2->i11][t2->i12][t2->i13]), t2->t[0]);
+        cuda_atomicAdd(&(J->M[t2->i21][t2->i22][t2->i23]), t2->t[1]);
+        cuda_atomicAdd(&(J->M[t2->i31][t2->i32][t2->i33]), t2->t[2]);
+        cuda_atomicAdd(&(J->M[t2->i41][t2->i42][t2->i43]), t2->t[3]);
     }
 }
+
 
 __device__ void copyCellDouble_GPU(CellDouble *dst, CellDouble *src, unsigned int n) {
     if (n < CellExtent * CellExtent * CellExtent) {

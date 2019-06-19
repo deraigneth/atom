@@ -20,8 +20,6 @@ void emeElement(Cell *, int3, double *, double *, double *, double *, double, do
 
 double cuda_atomicAdd(double *, double ) ;
 
-void GPU_getCellEnergy(GPUCell **, double *, double *, double *, double *);
-
 
 void GPU_SetFieldsToCells(GPUCell **, double *, double *, double *, double *, double *, double *);
 

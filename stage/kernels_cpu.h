@@ -1,7 +1,5 @@
 
 
-double atomicADD(double *address, double val) ;
-
 void SetAllCurrentsToZero_CPU(GPUCell **);
 
 void WriteControlSystem_CPU(Cell **);
