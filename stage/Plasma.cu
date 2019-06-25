@@ -2,6 +2,8 @@
 // Created by egor on 19.02.19.
 //
 
+// cudaLaunchKernel(kernel<type>, grid.x, grid.y, grid.z, block.x, block.y, block.z, arg, shared, stream);
+
 #include "../../include/Plasma.h"
 
 Plasma::Plasma(PlasmaConfig *p) {
@@ -323,6 +325,8 @@ int Plasma::MagneticFieldTrace(double *Q, double *H, double *E1, double *E2, int
                     (void *) &c2,
                     (void *) &d1,
                     (void *) &d2,
+                    (void *) &dimGrid,
+                    (void *) &dimBlock,
                     0};
 
     int cudaStatus = cudaLaunchKernel(
@@ -427,20 +431,22 @@ int Plasma::SetPeriodicCurrentComponent(GPUCell **cells, double *J, int dir, uns
     int i_s = 0;
     int k_s = 0;
     int N = Nx + 2;
-    void *args[] = {(void *) &cells,
+    void *args1[] = {(void *) &cells,
                     (void *) &J,
                     (void *) &dir,
                     (void *) &dir2,
                     (void *) &i_s,
                     (void *) &k_s,
                     (void *) &N,
+                    (void *) &dimGridX,
+                    (void *) &dimBlock,
                     0};
 
     int cudaStatus = cudaLaunchKernel(
             (const void *) GPU_CurrentPeriodic, // pointer to kernel func.
             dimGridX,                           // grid
             dimBlock,                           // block
-            args,                               // arguments
+            args1,                               // arguments
             16000,
             0
     );
@@ -449,11 +455,22 @@ int Plasma::SetPeriodicCurrentComponent(GPUCell **cells, double *J, int dir, uns
 
     dir2 = 1;
     N = Ny + 2;
+    void *args2[] = {(void *) &cells,
+                    (void *) &J,
+                    (void *) &dir,
+                    (void *) &dir2,
+                    (void *) &i_s,
+                    (void *) &k_s,
+                    (void *) &N,
+                    (void *) &dimGridY,
+                    (void *) &dimBlock,
+                    0};
+
     cudaStatus = cudaLaunchKernel(
             (const void *) GPU_CurrentPeriodic, // pointer to kernel func.
             dimGridY,                           // grid
             dimBlock,                           // block
-            args,                               // arguments
+            args2,                               // arguments
             16000,
             0
     );
@@ -462,11 +479,22 @@ int Plasma::SetPeriodicCurrentComponent(GPUCell **cells, double *J, int dir, uns
 
     dir2 = 2;
     N = Nz + 2;
+    void *args3[] = {(void *) &cells,
+                    (void *) &J,
+                    (void *) &dir,
+                    (void *) &dir2,
+                    (void *) &i_s,
+                    (void *) &k_s,
+                    (void *) &N,
+                    (void *) &dimGridZ,
+                    (void *) &dimBlock,
+                    0};
+
     cudaStatus = cudaLaunchKernel(
             (const void *) GPU_CurrentPeriodic, // pointer to kernel func.
             dimGridZ,                       // grid
             dimBlock,                      // block
-            args,                          // arguments
+            args3,                          // arguments
             16000,
             0
     );
@@ -664,7 +692,7 @@ int Plasma::StepAllCells() {
 
     std::cout << "begin step" << std::endl;
 
-    void *args[] = {(void *) &pd->d_CellArray, 0};
+    void *args[] = {(void *) &pd->d_CellArray, (void *) &dimGrid, (void *) &dimBlock,  0};
 
     err = cudaLaunchKernel(
             (const void *) GPU_StepAllCells, // pointer to kernel func.
@@ -676,7 +704,7 @@ int Plasma::StepAllCells() {
     );
     CHECK_ERROR("GPU_StepAllCells", err);
 
-    void *args1[] = {(void *) &pd->d_CellArray, 0};
+    void *args1[] = {(void *) &pd->d_CellArray, (void *) &dimGrid, (void *) &dimBlock, 0};
     err = cudaFuncSetCacheConfig((const void *) GPU_CurrentsAllCells, cudaFuncCachePreferShared);
     CHECK_ERROR("cudaFuncSetCacheConfig", err);
 
@@ -774,6 +802,8 @@ int Plasma::reallyPassParticlesToAnotherCells(int *stage1, int *d_stage1) {
     void *args[] = {
             (void *) &pd->d_CellArray,
             (void *) &d_stage1,
+            (void *) &dimGridBulk,
+            (void *) &dimBlockOne,
             0};
 
     cudaError_t cudaStatus = cudaLaunchKernel(
