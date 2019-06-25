@@ -1,5 +1,8 @@
+//
+// Created by egor on 19.02.19.
+//
 
-
+// cudaLaunchKernel(kernel<type>, grid.x, grid.y, grid.z, block.x, block.y, block.z, arg, shared, stream);
 
 #include "../../include/Plasma.h"
 
@@ -253,6 +256,8 @@ double Plasma::getElectricEnergy() {
                     (void *) &pd->d_Ex,
                     (void *) &pd->d_Ey,
                     (void *) &pd->d_Ez,
+                    (void *) &dimGrid,
+                    (void *) &dimBlockOne,
                     0};
 
     int cudaStatus = cudaLaunchKernel(
@@ -380,6 +385,8 @@ int Plasma::PeriodicBoundaries(double *E, int dir, int start1, int end1, int sta
                     (void *) &dir,
                     (void *) &zero,
                     (void *) &N,
+                    (void *) &dimGrid,
+                    (void *) &dimBlock,
                     0};
 
     int cudaStatus = cudaLaunchKernel(
@@ -403,6 +410,8 @@ int Plasma::PeriodicBoundaries(double *E, int dir, int start1, int end1, int sta
                      (void *) &dir,
                      (void *) &N1,
                      (void *) &one,
+                     (void *) &dimGrid,
+                     (void *) &dimBlock,
                      0};
 
     cudaStatus = cudaLaunchKernel(
@@ -639,7 +648,10 @@ int Plasma::SetCurrentsInCellsToZero() {
 
     dim3 dimGrid((unsigned int)(Nx + 2), (unsigned int)(Ny + 2), (unsigned int)(Nz + 2)), dimBlockExt(CellExtent, CellExtent, CellExtent);
 
-    void *args[] = {(void *) &pd->d_CellArray, 0};
+    void *args[] = {(void *) &pd->d_CellArray,
+                    (void *) &dimGrid,
+                    (void *) &dimBlockExt,
+                     0};
     int err = cudaLaunchKernel(
             (const void *) GPU_SetAllCurrentsToZero, // pointer to kernel func.
             dimGrid,                                 // grid
@@ -742,6 +754,8 @@ int Plasma::MakeParticleList(int *stage, int **d_stage, int **d_stage1) {
     void *args[] = {
             (void *) &pd->d_CellArray,
             (void *) d_stage,
+            (void *) dimGrid,
+            (void *) dimBlockOne,
             0};
 
     err = cudaLaunchKernel(
