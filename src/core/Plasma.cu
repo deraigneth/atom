@@ -1,6 +1,5 @@
 
 
-
 #include "../../include/Plasma.h"
 
 Plasma::Plasma(PlasmaConfig *p) {
