@@ -12,7 +12,7 @@ void MoveParticlesInCell_CPU(Cell *, int , int );
 
 void StepAllCells_CPU(GPUCell **);
 
-void emh2_CPU(GPUCell **, int , int , int , double *, double *);
+void emh2_CPU(GPUCell **, int , int , int , double *, double *, dim3 , dim3);
 
 void emeElement_CPU(Cell *, int3 , double *, double *, double *, double *, double , double , double , int3 , int3 );
 
@@ -22,7 +22,7 @@ double atomicADD_CPU(double *, double ) ;
 
 
 
-void SetFieldsToCells_CPU(GPUCell **, double *, double *, double *, double *, double *, double *) ;
+void SetFieldsToCells_CPU(GPUCell **, double *, double *, double *, double *, double *, double *, dim3, dim3) ;
 
 void MakeDepartureLists_CPU(GPUCell **, int *) ;
 
@@ -42,7 +42,7 @@ void   CurrentPeriodic_CPU(GPUCell **, double *, int , int , int , int , int );
 
 void getCellEnergy_CPU(GPUCell **, double *, double *, double *, double *);
 
-void writeAllCurrents_CPU(GPUCell **, int , double *, double *, double *, double *);
+void writeAllCurrents_CPU(GPUCell **, int , double *, double *, double *, double *,dim3, dim3);
 
 void setCellDoubleToZero_CPU(CellDouble *, unsigned int );
 
@@ -64,4 +64,4 @@ void periodicCurrentElement_CPU(Cell *, int , int , double *, int , int , int );
 
 void periodic_CPU(GPUCell**, int , int , double *, int , int , int );
 
-void  eme_CPU(**cells,  s,  *E,  *H1,  *H2,  *J,  c1,  c2,  tau,  d1,  d2);
+void  eme_CPU(GPUCell **, int3 , double *, double *, double *, double *, double , double , double , int3 , int3 , dim3 , dim3 );

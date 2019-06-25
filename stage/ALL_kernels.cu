@@ -64,12 +64,12 @@ void GPU_StepAllCells(GPUCell **cells){
 #endif
 
 #ifdef __CUDACC__
-void GPU_emh2(GPUCell **cells, int i_s, int l_s, int k_s, double *Q, double *H){
+void GPU_emh2(GPUCell **cells, int i_s, int l_s, int k_s, double *Q, double *H, dim3 dimGrid, dim3 dimBlock){
    emh2_GPU( **cells,  i_s,  l_s,  k_s,  *Q,  *H);
 }
 #else
-void GPU_emh2(GPUCell **cells, int i_s, int l_s, int k_s, double *Q, double *H){
-   emh2_CPU( **cells,  i_s,  l_s,  k_s,  *Q,  *H);
+void GPU_emh2(GPUCell **cells, int i_s, int l_s, int k_s, double *Q, double *H, dim3 dimGrid, dim3 dimBlock){
+   emh2_CPU( **cells,  i_s,  l_s,  k_s,  *Q,  *H, dimGrid, dimBlock);
 }
 #endif
 
@@ -117,12 +117,12 @@ void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey
 
 
 #ifdef __CUDACC__
-void GPU_WriteAllCurrents(GPUCell **cells, int n0, double *jx, double *jy, double *jz, double *rho){
+void GPU_WriteAllCurrents(GPUCell **cells, int n0, double *jx, double *jy, double *jz, double *rho, dim3 dimGrid, dim3 dimBlock){
   writeAllCurrents_GPU( **cells,  n0,  *jx,  *jy,  *jz,  *rho);
 }
 #else
-void GPU_WriteAllCurrents(GPUCell **cells, int n0, double *jx, double *jy, double *jz, double *rho){
-  writeAllCurrents_CPU( **cells,  n0,  *jx,  *jy,  *jz,  *rho);
+void GPU_WriteAllCurrents(GPUCell **cells, int n0, double *jx, double *jy, double *jz, double *rho, dim3 dimGrid, dim3 dimBlock){
+  writeAllCurrents_CPU( **cells,  n0,  *jx,  *jy,  *jz,  *rho, dimGrid, dimBlock);
 }
 #endif
 
@@ -204,12 +204,12 @@ void GPU_emh1(GPUCell **cells, double *Q, double *H, double *E1, double *E2, dou
 
 
 #ifdef __CUDACC__
-void GPU_SetFieldsToCells(GPUCell **cells, double *Ex, double *Ey, double *Ez, double *Hx, double *Hy, double *Hz){
+void GPU_SetFieldsToCells(GPUCell **cells, double *Ex, double *Ey, double *Ez, double *Hx, double *Hy, double *Hz, dim3 dimGrid, dim3 dimBlockExt){
   SetFieldsToCells_GPU( **cells,  *Ex,  *Ey,  *Ez,  *Hx,  *Hy,  *Hz) ;
 }
 #else
-void GPU_SetFieldsToCells(GPUCell **cells, double *Ex, double *Ey, double *Ez, double *Hx, double *Hy, double *Hz){
-  SetFieldsToCells_CPU( **cells,  *Ex,  *Ey,  *Ez,  *Hx,  *Hy,  *Hz) ;
+void GPU_SetFieldsToCells(GPUCell **cells, double *Ex, double *Ey, double *Ez, double *Hx, double *Hy, double *Hz,  dim3 dimGrid, dim3 dimBlockExt){
+  SetFieldsToCells_CPU( **cells,  *Ex,  *Ey,  *Ez,  *Hx,  *Hy,  *Hz, dimGrid, dimBlockExt) ;
 }
 #endif
 
@@ -350,12 +350,12 @@ void GPU_CurrentPeriodic(GPUCell **cells, double *E, int dirE, int dir, int i_s,
 #endif
 
 #ifdef __CUDACC__
-void  GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2){
+void  GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2, dim3 dimGrid, dim3 dimBlock){
   eme_GPU( **cells,  s,  *E,  *H1,  *H2,  *J,  c1,  c2,  tau,  d1,  d2);
 }
 #else
-void  GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2){
-  eme_CPU(**cells,  s,  *E,  *H1,  *H2,  *J,  c1,  c2,  tau,  d1,  d2);
+void  GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double *J, double c1, double c2, double tau, int3 d1, int3 d2, dim3 dimGrid, dim3 dimBlock){
+  eme_CPU(**cells,  s,  *E,  *H1,  *H2,  *J,  c1,  c2,  tau,  d1,  d2, dimGrid, dimBlock);
 }
 #endif
 

@@ -1,3 +1,6 @@
+#include "wrappers.h"
+
+
 #ifdef __CUDACC__
 int MemoryCopy(void* dst,void *src,size_t size,int dir) {
     cudaMemcpyKind cuda_dir;
@@ -13,6 +16,7 @@ int MemoryCopy(void* dst,void *src,size_t size,int dir) {
 }
 #else
 int MemoryCopy(void *dst, void *src, size_t size, int dir) {
+    memcpy ( dst, src, size );
     return 0;
 }
 #endif
@@ -25,7 +29,12 @@ int MemoryAllocate(void** dst,size_t size) {
 }
 #else
 int MemoryAllocate(void **dst, size_t size) {
+  dst = (char**) malloc (size);
+  if (dst==NULL){
+    exit (-1);
+  } else {
     return 0;
+  }
 }
 #endif
 
@@ -76,4 +85,15 @@ int memory_monitor(std::string legend) {
 }
 #endif
 
-///
+
+
+
+#ifdef __CUDACC__
+int MemorySet(void * ptr, int value, size_t num){
+  return (cudaMemset(ptr, value, num )) ;
+}
+#else
+int MemorySet(void * ptr, int value, size_t num){
+  return (memset(ptr, value, num )) ;
+}
+#endif
