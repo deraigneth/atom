@@ -4,7 +4,9 @@
 
 // cudaLaunchKernel(kernel<type>, grid.x, grid.y, grid.z, block.x, block.y, block.z, arg, shared, stream);
 
-#include "../../include/Plasma.h"
+
+
+#include "../include/Plasma.h"
 
 Plasma::Plasma(PlasmaConfig *p) {
     this->pd = p;
@@ -113,18 +115,34 @@ void Plasma::emeGPUIterate(int3 s, int3 f, double *E, double *H1, double *H2, do
                     (void *) &tau,
                     (void *) &d1,
                     (void *) &d2,
+
+                    (void*) &dimGrid,
+                    (void*) &dimBlock,
                     0};
 
-    int cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_eme,        // pointer to kernel func.
-            dimGrid,                       // grid
-            dimBlock,                      // block
-            args,                          // arguments
-            0,
-            0
-    );
+    // int cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_eme,        // pointer to kernel func.
+    //         dimGrid,                       // grid
+    //         dimBlock,                      // block
+    //         args,                          // arguments
+    //         0,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      int status = cudaLaunchKernel(
+              (const void *) eme_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlock,                      // block
+              args,                          // arguments
+              0,
+              0 ) ;
+    #else
+      int status = eme_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
 
-    CHECK_ERROR("Launch kernel", cudaStatus);
+    CHECK_ERROR("Launch kernel", status);
+
 }
 
 void Plasma::GetElectricFieldStartsDirs(int3 *start, int3 *d1, int3 *d2, int dir) {
@@ -245,11 +263,14 @@ double Plasma::getElectricEnergy() {
     double ee;
 
     if (first == 1) {
-        cudaMalloc((void **) &d_ee, sizeof(double));
+
+        // cudaMalloc((void **) &d_ee, sizeof(double));
+        MemoryAllocate((void **) &d_ee, sizeof(double));
         first = 0;
     }
 
-    cudaMemset(d_ee, 0, sizeof(double));
+    // cudaMemset(d_ee, 0, sizeof(double));
+    MemorySet(d_ee, 0, sizeof(double));
 
     void *args[] = {(void *) &pd->d_CellArray,
                     (void *) &d_ee,
@@ -258,20 +279,33 @@ double Plasma::getElectricEnergy() {
                     (void *) &pd->d_Ez,
                     0};
 
-    int cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_getCellEnergy, // pointer to kernel func.
-            dimGrid,                          // grid
-            dimBlockOne,                      // block
-            args,                             // arguments
-            0,
-            0
-    );
 
-    CHECK_ERROR("GPU_getCellEnergy", cudaStatus);
+    // int cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_getCellEnergy, // pointer to kernel func.
+    //         dimGrid,                          // grid
+    //         dimBlockOne,                      // block
+    //         args,                             // arguments
+    //         0,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      int status = cudaLaunchKernel(
+              (const void *) getCellEnergy_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlockOne,                      // block
+              args,                          // arguments
+              0,
+              0 ) ;
+    #else
+      int status = getCellEnergy_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
 
-    cudaStatus = MemoryCopy(&ee, d_ee, sizeof(double), DEVICE_TO_HOST);
+    CHECK_ERROR("GPU_getCellEnergy", status);
 
-    CHECK_ERROR("MEM COPY", cudaStatus);
+    status = MemoryCopy(&ee, d_ee, sizeof(double), DEVICE_TO_HOST);
+
+    CHECK_ERROR("MEM COPY", status);
 
     return ee;
 }
@@ -325,20 +359,37 @@ int Plasma::MagneticFieldTrace(double *Q, double *H, double *E1, double *E2, int
                     (void *) &c2,
                     (void *) &d1,
                     (void *) &d2,
+
                     (void *) &dimGrid,
                     (void *) &dimBlock,
                     0};
 
-    int cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_emh1, // pointer to kernel func.
-            dimGrid,                 // grid
-            dimBlock,                // block
-            args,                    // arguments
-            0,
-            0
-    );
 
-    CHECK_ERROR("GPU_emh1", cudaStatus);
+
+    // int cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_emh1, // pointer to kernel func.
+    //         dimGrid,                 // grid
+    //         dimBlock,                // block
+    //         args,                    // arguments
+    //         0,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      int status = cudaLaunchKernel(
+              (const void *) emh1_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlock,                      // block
+              args,                          // arguments
+              0,
+              0 ) ;
+    #else
+      int status = emh1_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
+
+
+    CHECK_ERROR("GPU_emh1", status);
+
 
     return 0;
 }
@@ -356,18 +407,34 @@ int Plasma::SimpleMagneticFieldTrace(Cell &c, double *Q, double *H, int i_end, i
                     (void *) &k_s,
                     (void *) &Q,
                     (void *) &H,
+
+                    (void *) &dimGrid,
+                    (void *) &dimBlock,
                     0};
 
-    int cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_emh2,       // pointer to kernel func.
-            dimGrid,                       // grid
-            dimBlock,                      // block
-            args,                          // arguments
-            0,
-            0
-    );
+    // int cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_emh2,       // pointer to kernel func.
+    //         dimGrid,                       // grid
+    //         dimBlock,                      // block
+    //         args,                          // arguments
+    //         0,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      int status = cudaLaunchKernel(
+              (const void *) emh2_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlock,                      // block
+              args,                          // arguments
+              0,
+              0 ) ;
+    #else
+      int status = emh2_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
 
-    CHECK_ERROR("GPU_emh2", cudaStatus);
+    CHECK_ERROR("GPU_emh2", status);
+
 
     return 0;
 }
@@ -387,16 +454,30 @@ int Plasma::PeriodicBoundaries(double *E, int dir, int start1, int end1, int sta
                     (void *) &N,
                     0};
 
-    int cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_periodic,   // pointer to kernel func.
-            dimGrid,                       // grid
-            dimBlock,                      // block
-            args,                          // arguments
-            0,
-            0
-    );
 
-    CHECK_ERROR("GPU_periodic", cudaStatus);
+    // int cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_periodic,   // pointer to kernel func.
+    //         dimGrid,                       // grid
+    //         dimBlock,                      // block
+    //         args,                          // arguments
+    //         0,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      int status = cudaLaunchKernel(
+              (const void *) periodic_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlock,                      // block
+              args,                          // arguments
+              0,
+              0 ) ;
+    #else
+      int status = periodic_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
+
+    CHECK_ERROR("GPU_periodic", status);
+
 
     int one = 1;
     int N1 = N + 1;
@@ -410,16 +491,30 @@ int Plasma::PeriodicBoundaries(double *E, int dir, int start1, int end1, int sta
                      (void *) &one,
                      0};
 
-    cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_periodic,   // pointer to kernel func.
-            dimGrid,                       // grid
-            dimBlock,                      // block
-            args1,                         // arguments
-            0,
-            0
-    );
 
-    CHECK_ERROR("GPU_periodic", cudaStatus);
+    // cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_periodic,   // pointer to kernel func.
+    //         dimGrid,                       // grid
+    //         dimBlock,                      // block
+    //         args1,                         // arguments
+    //         0,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      status = cudaLaunchKernel(
+              (const void *) periodic_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlock,                      // block
+              args1,                          // arguments
+              0,
+              0 ) ;
+    #else
+      status = periodic_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
+
+    CHECK_ERROR("GPU_periodic", status);
+
 
     return 0;
 }
@@ -431,27 +526,41 @@ int Plasma::SetPeriodicCurrentComponent(GPUCell **cells, double *J, int dir, uns
     int i_s = 0;
     int k_s = 0;
     int N = Nx + 2;
+
     void *args1[] = {(void *) &cells,
+
                     (void *) &J,
                     (void *) &dir,
                     (void *) &dir2,
                     (void *) &i_s,
                     (void *) &k_s,
                     (void *) &N,
+
                     (void *) &dimGridX,
                     (void *) &dimBlock,
                     0};
 
-    int cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_CurrentPeriodic, // pointer to kernel func.
-            dimGridX,                           // grid
-            dimBlock,                           // block
-            args1,                               // arguments
-            16000,
-            0
-    );
-
-    CHECK_ERROR("Launch kernel", cudaStatus);
+    // int cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_CurrentPeriodic, // pointer to kernel func.
+    //         dimGridX,                           // grid
+    //         dimBlock,                           // block
+    //         args,                               // arguments
+    //         16000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      int status = cudaLaunchKernel(
+              (const void *) CurrentPeriodic_GPU,   // pointer to kernel func.
+              dimGridX,                       // grid
+              dimBlock,                      // block
+              args1,                          // arguments
+              16000,
+              0 ) ;
+    #else
+      int status = CurrentPeriodic_CPU(args1) ;
+    #endif
+/////// NEED CHECK HERE
+    CHECK_ERROR("Launch kernel", status);
 
     dir2 = 1;
     N = Ny + 2;
@@ -466,16 +575,28 @@ int Plasma::SetPeriodicCurrentComponent(GPUCell **cells, double *J, int dir, uns
                     (void *) &dimBlock,
                     0};
 
-    cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_CurrentPeriodic, // pointer to kernel func.
-            dimGridY,                           // grid
-            dimBlock,                           // block
-            args2,                               // arguments
-            16000,
-            0
-    );
+    // cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_CurrentPeriodic, // pointer to kernel func.
+    //         dimGridY,                           // grid
+    //         dimBlock,                           // block
+    //         args,                               // arguments
+    //         16000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      status = cudaLaunchKernel(
+              (const void *) CurrentPeriodic_GPU,   // pointer to kernel func.
+              dimGridY,                       // grid
+              dimBlock,                      // block
+              args2,                          // arguments
+              16000,
+              0 ) ;
+    #else
+      status = CurrentPeriodic_CPU(args2) ;
+    #endif
+/////// NEED CHECK HERE
 
-    CHECK_ERROR("Launch kernel", cudaStatus);
+    CHECK_ERROR("Launch kernel", status);
 
     dir2 = 2;
     N = Nz + 2;
@@ -490,16 +611,30 @@ int Plasma::SetPeriodicCurrentComponent(GPUCell **cells, double *J, int dir, uns
                     (void *) &dimBlock,
                     0};
 
-    cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_CurrentPeriodic, // pointer to kernel func.
-            dimGridZ,                       // grid
-            dimBlock,                      // block
-            args3,                          // arguments
-            16000,
-            0
-    );
+    // cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_CurrentPeriodic, // pointer to kernel func.
+    //         dimGridZ,                       // grid
+    //         dimBlock,                      // block
+    //         args,                          // arguments
+    //         16000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      status = cudaLaunchKernel(
+              (const void *) CurrentPeriodic_GPU,   // pointer to kernel func.
+              dimGridZ,                       // grid
+              dimBlock,                      // block
+              args3,                          // arguments
+              16000,
+              0 ) ;
+    #else
+      status = CurrentPeriodic_CPU(args3) ;
+    #endif
+/////// NEED CHECK HERE
 
-    CHECK_ERROR("Launch kernel", cudaStatus);
+    CHECK_ERROR("Launch kernel", status);
+
+
 
     return 0;
 }
@@ -520,34 +655,62 @@ void Plasma::AssignCellsToArraysGPU() {
     size_t sz;
     dim3 dimGrid(Nx, Ny, Nz), dimBlockExt(CellExtent, CellExtent, CellExtent);
 
-#ifdef DEBUG
-    err = cudaDeviceGetLimit(&sz, cudaLimitStackSize);
-    CHECK_ERROR("DEVICE LIMIT", err);
-    printf("%s:%d - stack limit %d\n", __FILE__, __LINE__, ((int) sz));
-#endif
-    err = cudaDeviceSetLimit(cudaLimitStackSize, 64 * 1024);
-    CHECK_ERROR("DEVICE LIMIT", err);
-#ifdef DEBUG
-    printf("%s:%d - set stack limit \n", __FILE__, __LINE__);
-#endif
-#ifdef DEBUG
-    err = cudaDeviceGetLimit(&sz, cudaLimitStackSize);
-    CHECK_ERROR("DEVICE LIMIT", err);
-    printf("%s:%d - stack limit %d \n", __FILE__, __LINE__, ((int) sz));
+
+#ifdef __CUDACC__
+  #ifdef DEBUG
+      err = cudaDeviceGetLimit(&sz, cudaLimitStackSize);
+      CHECK_ERROR("DEVICE LIMIT", err);
+      printf("%s:%d - stack limit %d\n", __FILE__, __LINE__, ((int) sz));
+  #endif
+      err = cudaDeviceSetLimit(cudaLimitStackSize, 64 * 1024);
+      CHECK_ERROR("DEVICE LIMIT", err);
+  #ifdef DEBUG
+      printf("%s:%d - set stack limit \n", __FILE__, __LINE__);
+  #endif
+  #ifdef DEBUG
+      err = cudaDeviceGetLimit(&sz, cudaLimitStackSize);
+      CHECK_ERROR("DEVICE LIMIT", err);
+      printf("%s:%d - stack limit %d \n", __FILE__, __LINE__, ((int) sz));
+  #endif
 #endif
 
-    void *args[] = {(void *) &pd->d_CellArray, &pd->d_Ex, &pd->d_Ey, &pd->d_Ez, &pd->d_Hx, &pd->d_Hy, &pd->d_Hz, 0};
-    err = cudaLaunchKernel(
-            (const void *) GPU_SetFieldsToCells, // pointer to kernel func.
-            dimGrid,                             // grid
-            dimBlockExt,                         // block
-            args,                                // arguments
-            16000,
-            0
-    );
+
+    void *args[] = {(void *) &pd->d_CellArray,
+                    (void *) &pd->d_Ex,
+                    (void *) &pd->d_Ey,
+                    (void *) &pd->d_Ez,
+                    (void *) &pd->d_Hx,
+                    (void *) &pd->d_Hy,
+                    (void *) &pd->d_Hz,
+                    (void *) &dimGrid,
+                    (void *) &dimBlockExt,
+                    0};
+    // err = cudaLaunchKernel(
+    //         (const void *) GPU_SetFieldsToCells, // pointer to kernel func.
+    //         dimGrid,                             // grid
+    //         dimBlockExt,                         // block
+    //         args,                                // arguments
+    //         16000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      err = cudaLaunchKernel(
+              (const void *) SetFieldsToCells_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlockExt,                      // block
+              args,                          // arguments
+              16000,
+              0 ) ;
+    #else
+      err = SetFieldsToCells_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
     CHECK_ERROR("GPU_SetFieldsToCells", err);
+    #ifdef __CUDACC__
     err = cudaDeviceSynchronize();
     CHECK_ERROR("cudaDeviceSynchronize", err);
+    #endif
+
 }
 
 void Plasma::readControlPoint(const char * fn, int field_assign,
@@ -651,13 +814,17 @@ int Plasma::SetCurrentArraysToZero() {
     memset(pd->Jy, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
     memset(pd->Jz, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
 
-    err = cudaMemset(pd->d_Jx, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+
+    // err = cudaMemset(pd->d_Jx, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+    err = MemorySet(pd->d_Jx, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
     CHECK_ERROR("MEM SET", err);
 
-    err = cudaMemset(pd->d_Jy, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+    // err = cudaMemset(pd->d_Jy, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+    err = MemorySet(pd->d_Jy, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
     CHECK_ERROR("MEM SET", err);
 
-    err = cudaMemset(pd->d_Jz, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+    // err = cudaMemset(pd->d_Jz, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+     err = MemorySet(pd->d_Jz, 0, sizeof(double) * (Nx + 2) * (Ny + 2) * (Nz + 2));
     CHECK_ERROR("MEM SET", err);
 
     return 0;
@@ -669,14 +836,27 @@ int Plasma::SetCurrentsInCellsToZero() {
     dim3 dimGrid((unsigned int)(Nx + 2), (unsigned int)(Ny + 2), (unsigned int)(Nz + 2)), dimBlockExt(CellExtent, CellExtent, CellExtent);
 
     void *args[] = {(void *) &pd->d_CellArray, 0};
-    int err = cudaLaunchKernel(
-            (const void *) GPU_SetAllCurrentsToZero, // pointer to kernel func.
-            dimGrid,                                 // grid
-            dimBlockExt,                             // block
-            args,                                    // arguments
-            16000,
-            0
-    );
+
+    // int err = cudaLaunchKernel(
+    //         (const void *) GPU_SetAllCurrentsToZero, // pointer to kernel func.
+    //         dimGrid,                                 // grid
+    //         dimBlockExt,                             // block
+    //         args,                                    // arguments
+    //         16000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      int err = cudaLaunchKernel(
+              (const void *) SetAllCurrentsToZero_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlockExt,                      // block
+              args,                          // arguments
+              16000,
+              0 ) ;
+    #else
+      int err = SetAllCurrentsToZero_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
 
     CHECK_ERROR("GPU_SetAllCurrentsToZero", err);
 
@@ -685,45 +865,76 @@ int Plasma::SetCurrentsInCellsToZero() {
 
 int Plasma::StepAllCells() {
     int Nx = pd->nx, Ny = pd->ny, Nz = pd->nz;
+
+
+    int err ;
     dim3 dimGrid((unsigned int)(Nx + 2), (unsigned int)(Ny + 2), (unsigned int)(Nz + 2)), dimBlock(512, 1, 1);
 
-    int err = cudaDeviceSynchronize();
-    CHECK_ERROR("cudaDeviceSynchronize", err);
+    #ifdef __CUDACC__
+      err = cudaDeviceSynchronize();
+      CHECK_ERROR("cudaDeviceSynchronize", err);
+    #endif
 
     std::cout << "begin step" << std::endl;
 
     void *args[] = {(void *) &pd->d_CellArray, (void *) &dimGrid, (void *) &dimBlock,  0};
 
-    err = cudaLaunchKernel(
-            (const void *) GPU_StepAllCells, // pointer to kernel func.
-            dimGrid,                         // grid
-            dimBlock,                        // block
-            args,                            // arguments
-            16000,
-            0
-    );
+    // err = cudaLaunchKernel(
+    //         (const void *) GPU_StepAllCells, // pointer to kernel func.
+    //         dimGrid,                         // grid
+    //         dimBlock,                        // block
+    //         args,                            // arguments
+    //         16000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      err = cudaLaunchKernel(
+              (const void *) StepAllCells_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlock,                      // block
+              args,                          // arguments
+              16000,
+              0 ) ;
+    #else
+      err = StepAllCells_GPU(args) ;
+    #endif
+/////// NEED CHECK HERE
     CHECK_ERROR("GPU_StepAllCells", err);
 
     void *args1[] = {(void *) &pd->d_CellArray, (void *) &dimGrid, (void *) &dimBlock, 0};
+    #ifdef __CUDACC__
     err = cudaFuncSetCacheConfig((const void *) GPU_CurrentsAllCells, cudaFuncCachePreferShared);
     CHECK_ERROR("cudaFuncSetCacheConfig", err);
+    #endif
+    // err = cudaLaunchKernel(
+    //         (const void *) GPU_CurrentsAllCells, // pointer to kernel func.
+    //         dimGrid,                             // grid
+    //         dimBlock,                            // block
+    //         args1,                               // arguments
+    //         4000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      err = cudaLaunchKernel(
+              (const void *) CurrentsAllCells_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlock,                      // block
+              args1,                          // arguments
+              4000,
+              0 ) ;
+    #else
+      err = CurrentsAllCells_CPU(args1) ;
+    #endif
 
-    err = cudaLaunchKernel(
-            (const void *) GPU_CurrentsAllCells, // pointer to kernel func.
-            dimGrid,                             // grid
-            dimBlock,                            // block
-            args1,                               // arguments
-            4000,
-            0
-    );
 
     CHECK_ERROR("GPU_CurrentsAllCells", err);
 
     std::cout << "end step" << std::endl;
 
+    #ifdef __CUDACC__
     err = cudaDeviceSynchronize();
     CHECK_ERROR("cudaDeviceSynchronize", err);
-
+    #endif
     std::cout << "end step-12" << std::endl;
 
     return 0;
@@ -741,16 +952,31 @@ int Plasma::WriteCurrentsFromCellsToArrays() {
                     (void *) &pd->d_Jy,
                     (void *) &pd->d_Jz,
                     (void *) &pd->d_Rho,
+
+                    (void *) &dimGrid ,
+                    (void *) &dimExt,
                     0};
 
-    cudaLaunchKernel(
-            (const void *) GPU_WriteAllCurrents, // pointer to kernel func.
-            dimGrid,                             // grid
-            dimExt,                              // block
-            args,                                // arguments
-            16000,
-            0
-    );
+    // cudaLaunchKernel(
+    //         (const void *) GPU_WriteAllCurrents, // pointer to kernel func.
+    //         dimGrid,                             // grid
+    //         dimExt,                              // block
+    //         args,                                // arguments
+    //         16000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      cudaLaunchKernel(
+              (const void *) writeAllCurrents_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimExt,                      // block
+              args,                          // arguments
+              16000,
+              0 ) ;
+    #else
+      writeAllCurrents_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
 
     memory_monitor("GPU_WriteAllCurrents");
 
@@ -762,10 +988,13 @@ int Plasma::MakeParticleList(int *stage, int **d_stage, int **d_stage1) {
     int err;
     dim3 dimGrid((unsigned int)(Nx + 2), (unsigned int)(Ny + 2), (unsigned int)(Nz + 2)), dimBlockOne(1, 1, 1);
 
-    err = cudaMalloc((void **) d_stage, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+
+    // err = cudaMalloc((void **) d_stage, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+    err = MemoryAllocate((void **) d_stage, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2));
     CHECK_ERROR("MEM ALLOCATION", err);
 
-    err = cudaMalloc((void **) d_stage1, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+    // err = cudaMalloc((void **) d_stage1, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+    err = MemoryAllocate((void **) d_stage1, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2));
     CHECK_ERROR("MEM ALLOCATION", err);
 
     void *args[] = {
@@ -773,18 +1002,33 @@ int Plasma::MakeParticleList(int *stage, int **d_stage, int **d_stage1) {
             (void *) d_stage,
             0};
 
-    err = cudaLaunchKernel(
-            (const void *) GPU_MakeDepartureLists, // pointer to kernel func.
-            dimGrid,                               // grid
-            dimBlockOne,                           // block
-            args,                                  // arguments
-            16000,
-            0
-    );
-    CHECK_ERROR("Launch kernel", err);
 
+
+    // err = cudaLaunchKernel(
+    //         (const void *) GPU_MakeDepartureLists, // pointer to kernel func.
+    //         dimGrid,                               // grid
+    //         dimBlockOne,                           // block
+    //         args,                                  // arguments
+    //         16000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      err = cudaLaunchKernel(
+              (const void *) MakeDepartureLists_GPU,   // pointer to kernel func.
+              dimGrid,                       // grid
+              dimBlockOne,                      // block
+              args,                          // arguments
+              16000,
+              0 ) ;
+    #else
+      err = MakeDepartureLists_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
+    CHECK_ERROR("Launch kernel", err);
+    #ifdef __CUDACC__
     err = cudaDeviceSynchronize();
     CHECK_ERROR("DEVICE SYNC", err);
+    #endif
 
     err = MemoryCopy(stage, *d_stage, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2), DEVICE_TO_HOST);
     CHECK_ERROR("MEM COPY", err);
@@ -797,7 +1041,9 @@ int Plasma::reallyPassParticlesToAnotherCells(int *stage1, int *d_stage1) {
     int Nx = pd->nx, Ny = pd->ny, Nz = pd->nz;
 
     dim3 dimGridBulk((unsigned int)Nx, (unsigned int)Ny, (unsigned int)Nz), dimBlockOne(1, 1, 1);
-    cudaMemset(d_stage1, 0, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+
+    // cudaMemset(d_stage1, 0, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2));
+    MemorySet(d_stage1, 0, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2));
 
     void *args[] = {
             (void *) &pd->d_CellArray,
@@ -806,15 +1052,29 @@ int Plasma::reallyPassParticlesToAnotherCells(int *stage1, int *d_stage1) {
             (void *) &dimBlockOne,
             0};
 
-    cudaError_t cudaStatus = cudaLaunchKernel(
-            (const void *) GPU_ArrangeFlights, // pointer to kernel func.
-            dimGridBulk,                       // grid
-            dimBlockOne,                       // block
-            args,                              // arguments
-            16000,
-            0
-    );
-    CHECK_ERROR("GPU_ArrangeFlights", cudaStatus);
+
+
+    // cudaError_t cudaStatus = cudaLaunchKernel(
+    //         (const void *) GPU_ArrangeFlights, // pointer to kernel func.
+    //         dimGridBulk,                       // grid
+    //         dimBlockOne,                       // block
+    //         args,                              // arguments
+    //         16000,
+    //         0
+    // );
+    #ifdef __CUDACC__
+      int status = cudaLaunchKernel(
+              (const void *) arrangeFlights_GPU,   // pointer to kernel func.
+              dimGridBulk,                       // grid
+              dimBlockOne,                      // block
+              args,                          // arguments
+              16000,
+              0 ) ;
+    #else
+      int status = arrangeFlights_CPU(args) ;
+    #endif
+/////// NEED CHECK HERE
+    CHECK_ERROR("GPU_ArrangeFlights", status);
 
     err = MemoryCopy(stage1, d_stage1, sizeof(int) * (Nx + 2) * (Ny + 2) * (Nz + 2), DEVICE_TO_HOST);
     CHECK_ERROR("MEM COPY", err);

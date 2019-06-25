@@ -28,10 +28,10 @@ int PlasmaInitializer::InitializeGPU() {
             Nx, Ny, Nz);
 
     setPrintfLimit();
-
+    #ifdef __CUDACC__
     err = cudaSetDevice(0);
     CHECK_ERROR("DEVICE SET", err);
-
+    #endif
     return 0;
 }
 
@@ -183,7 +183,8 @@ void PlasmaInitializer::InitGPUParticles() {
 
 
     p->h_CellArray = (GPUCell **) malloc(size * sizeof(Cell * ));
-    err = cudaMalloc((void **) &p->d_CellArray, size * sizeof(Cell * ));
+    // err = cudaMalloc((void **) &p->d_CellArray, size * sizeof(Cell * ));
+    err = MemoryAllocate((void **) &p->d_CellArray, size * sizeof(Cell * ));
     CHECK_ERROR("CUDA MALLOC", err);
 
     printf("%s : size = %d\n", __FILE__, size);
