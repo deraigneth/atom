@@ -10,7 +10,7 @@ void assignSharedWithLocal_CPU(CellDouble **,CellDouble **,CellDouble **,CellDou
 
 void MoveParticlesInCell_CPU(Cell *, int , int );
 
-void StepAllCells_CPU(GPUCell **);
+void StepAllCells_CPU(GPUCell **, dim3, dim3);
 
 void emh2_CPU(GPUCell **, int , int , int , double *, double *);
 
@@ -32,13 +32,13 @@ void copyFieldsToSharedMemory_CPU(CellDouble *, CellDouble *, CellDouble *, Cell
 
 void AccumulateCurrentWithParticlesInCell_CPU(CellDouble *, CellDouble *, CellDouble *, Cell *, int , int ) ;
 
-void CurrentsAllCells_CPU(GPUCell **);
+void CurrentsAllCells_CPU(GPUCell **, dim3, dim3);
 
 void emh1_Element_CPU(Cell *, int3 , double *, double *, double *, double *, double , double , int3 , int3 ) ;
 
 void periodicElement_CPU(Cell *, int, int, double *, int, int, int) ;
 
-void   CurrentPeriodic_CPU(GPUCell **, double *, int , int , int , int , int );
+void   CurrentPeriodic_CPU(GPUCell **, double *, int , int , int , int , int , dim3 , dim3);
 
 void getCellEnergy_CPU(GPUCell **, double *, double *, double *, double *);
 
@@ -58,10 +58,11 @@ void copyFromSharedMemoryToCell_CPU(
 
 void emh2_Element_CPU(Cell *, int , int , int , double *, double *);
 
-void emh1_CPU(GPUCell **, double *, double *, double *, double *, double , double , int3 , int3 );
+void emh1_CPU(GPUCell **, double *, double *, double *, double *, double , double , int3 , int3 , dim3 , dim3);
 
-void periodicCurrentElement_CPU(Cell *, int , int , double *, int , int , int );
 
 void periodic_CPU(GPUCell**, int , int , double *, int , int , int );
 
 void  eme_CPU(**cells,  s,  *E,  *H1,  *H2,  *J,  c1,  c2,  tau,  d1,  d2);
+
+void arrangeFlights_GPU(GPUCell **, int *, dim3, dim3);
