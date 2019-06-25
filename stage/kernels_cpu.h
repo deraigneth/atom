@@ -1,6 +1,6 @@
 
 
-void SetAllCurrentsToZero_CPU(GPUCell **);
+void SetAllCurrentsToZero_CPU(GPUCell **, dim3, dim3);
 
 void WriteControlSystem_CPU(Cell **);
 
@@ -10,7 +10,7 @@ void assignSharedWithLocal_CPU(CellDouble **,CellDouble **,CellDouble **,CellDou
 
 void MoveParticlesInCell_CPU(Cell *, int , int );
 
-void StepAllCells_CPU(GPUCell **);
+void StepAllCells_CPU(GPUCell **, dim3, dim3);
 
 void emh2_CPU(GPUCell **, int , int , int , double *, double *, dim3 , dim3);
 
@@ -24,7 +24,7 @@ double atomicADD_CPU(double *, double ) ;
 
 void SetFieldsToCells_CPU(GPUCell **, double *, double *, double *, double *, double *, double *, dim3, dim3) ;
 
-void MakeDepartureLists_CPU(GPUCell **, int *) ;
+void MakeDepartureLists_CPU(GPUCell **, int *, dim3, dim3) ;
 
 void copyCellDouble_CPU(CellDouble *, CellDouble *, unsigned int) ;
 
@@ -32,15 +32,15 @@ void copyFieldsToSharedMemory_CPU(CellDouble *, CellDouble *, CellDouble *, Cell
 
 void AccumulateCurrentWithParticlesInCell_CPU(CellDouble *, CellDouble *, CellDouble *, Cell *, int , int ) ;
 
-void CurrentsAllCells_CPU(GPUCell **);
+void CurrentsAllCells_CPU(GPUCell **, dim3, dim3);
 
 void emh1_Element_CPU(Cell *, int3 , double *, double *, double *, double *, double , double , int3 , int3 ) ;
 
 void periodicElement_CPU(Cell *, int, int, double *, int, int, int) ;
 
-void   CurrentPeriodic_CPU(GPUCell **, double *, int , int , int , int , int );
+void   CurrentPeriodic_CPU(GPUCell **, double *, int , int , int , int , int , dim3 , dim3);
 
-void getCellEnergy_CPU(GPUCell **, double *, double *, double *, double *);
+void getCellEnergy_CPU(GPUCell **, double *, double *, double *, double *, dim3, dim3);
 
 void writeAllCurrents_CPU(GPUCell **, int , double *, double *, double *, double *,dim3, dim3);
 
@@ -58,10 +58,12 @@ void copyFromSharedMemoryToCell_CPU(
 
 void emh2_Element_CPU(Cell *, int , int , int , double *, double *);
 
-void emh1_CPU(GPUCell **, double *, double *, double *, double *, double , double , int3 , int3 );
+void emh1_CPU(GPUCell **, double *, double *, double *, double *, double , double , int3 , int3 , dim3 , dim3);
 
-void periodicCurrentElement_CPU(Cell *, int , int , double *, int , int , int );
 
-void periodic_CPU(GPUCell**, int , int , double *, int , int , int );
+void periodic_CPU(GPUCell**, int , int , double *, int , int , int, dim3, dim3 );
+
+
+void arrangeFlights_GPU(GPUCell **, int *, dim3, dim3);
 
 void  eme_CPU(GPUCell **, int3 , double *, double *, double *, double *, double , double , double , int3 , int3 , dim3 , dim3 );

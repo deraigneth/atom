@@ -1,8 +1,8 @@
 
 
-void GPU_getCellEnergy(GPUCell **, double *, double *, double *, double *);
+void GPU_getCellEnergy(GPUCell **, double *, double *, double *, double *, dim3, dim3);
 
-void GPU_SetAllCurrentsToZero(GPUCell **);
+void GPU_SetAllCurrentsToZero(GPUCell **, dim3, dim3);
 
 void GPU_WriteControlSystem(Cell **);
 
@@ -12,7 +12,7 @@ void assignSharedWithLocal(CellDouble **, CellDouble **, CellDouble **, CellDoub
 
 void MoveParticlesInCell(Cell *, int , int );
 
-void GPU_StepAllCells(GPUCell **);
+void GPU_StepAllCells(GPUCell **, dim3, dim3);
 
 void GPU_emh2(GPUCell **, int , int , int , double *, double *,dim3,dim3);
 
@@ -20,11 +20,12 @@ void emeElement(Cell *, int3, double *, double *, double *, double *, double, do
 
 double cuda_atomicAdd(double *, double ) ;
 
+void GPU_getCellEnergy(GPUCell **, double *, double *, double *, double *);
 
 
 void GPU_SetFieldsToCells(GPUCell **, double *, double *, double *, double *, double *, double *, dim3, dim3);
 
-void GPU_MakeDepartureLists(GPUCell **, int *) ;
+void GPU_MakeDepartureLists(GPUCell **, int *, dim3, dim3) ;
 
 void copyCellDouble(CellDouble *, CellDouble *, unsigned int);
 
@@ -32,17 +33,17 @@ void copyFieldsToSharedMemory(CellDouble *, CellDouble *, CellDouble *, CellDoub
 
 void AccumulateCurrentWithParticlesInCell(CellDouble *, CellDouble *, CellDouble *, Cell *, int, int);
 
-void GPU_CurrentsAllCells(GPUCell **);
+void GPU_CurrentsAllCells(GPUCell **, dim3, dim3);
 
 void emh1_Element(Cell *, int3, double *, double *, double *, double *, double, double, int3, int3);
 
 void periodicElement(Cell *, int, int, double *, int, int, int);
 
-void GPU_CurrentPeriodic(GPUCell **, double *, int, int, int, int, int);
+void GPU_CurrentPeriodic(GPUCell **, double *, int, int, int, int, int, dim3, dim3);
 
 void GPU_WriteAllCurrents(GPUCell **, int , double *, double *, double *, double *,dim3, dim3);
 
-void GPU_ArrangeFlights(GPUCell **, int *);
+void GPU_ArrangeFlights(GPUCell **, int *, dim3, dim3);
 
 void setCellDoubleToZero(CellDouble *, unsigned int );
 
@@ -56,11 +57,11 @@ void copyFromSharedMemoryToCell(
         int
 );
 
-void GPU_periodic(GPUCell **, int, int, double *, int, int, int);
+void GPU_periodic(GPUCell **, int, int, double *, int, int, int, dim3, dim3);
 
 void emh2_Element(Cell *, int , int , int , double *, double *);
 
-void GPU_emh1(GPUCell **, double *, double *, double *, double *, double , double , int3 , int3 );
+void GPU_emh1(GPUCell **, double *, double *, double *, double *, double , double , int3 , int3 , dim3 , dim3);
 
 void periodicCurrentElement(Cell *, int , int , double *, int , int , int );
 
