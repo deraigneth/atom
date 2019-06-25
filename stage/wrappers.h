@@ -44,10 +44,10 @@ typedef struct dim3 dim3;
 
 const char *getErrorString(int err);
 
-int MemoryCopy(void* dst,void *src,size_t size,int dir);
+int MemoryCopy(void* ,void *,size_t ,int );
 /* fonction qui utilise les fonctions de mémoire de cuda en fonction de la direction (host to host,...) si cuda est défini*/
 
-int MemoryAllocate(void** dst,size_t size);
+int MemoryAllocate(void** ,size_t );
 /* fonction qui utilise cudaMalloc*/
 
 int getLastError();
@@ -55,7 +55,9 @@ int getLastError();
 
 int memory_monitor(std::string);
 
+int launchKernel( (const void*) fonction, dim3 dimGrid, dim3 dimBlock, void** args, size_t sharedMem, cuda_stream_t stream);
 
+int MemorySet(void * ptr, int value, size_t num) ;
 
 #endif /* ARCHAPI_H_ */
 
