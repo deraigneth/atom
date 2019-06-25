@@ -10,7 +10,7 @@ double atomicADD_CPU(double *address, double val) {
 }
 
 
-void SetAllCurrentsToZero_CPU(GPUCell **cells) {
+void SetAllCurrentsToZero_CPU(GPUCell **cells, dim3 dimGrid, dim3 dimBlockExt) {
 
 }
 
@@ -70,7 +70,7 @@ void SetFieldsToCells_CPU(GPUCell **cells, double *Ex, double *Ey, double *Ez, d
   }
 }
 
-void MakeDepartureLists_CPU(GPUCell **cells, int *d_stage){
+void MakeDepartureLists_CPU(GPUCell **cells, int *d_stage, dim3 dimGrid, dim3 dimBlockOne){
 
 }
 
@@ -113,8 +113,26 @@ void periodicElement_CPU(Cell *c, int i, int k, double *E, int dir, int to, int 
 
  }
 
-void getCellEnergy_CPU(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey, double *d_Ez){
-  // à voir plus tard
+void getCellEnergy_CPU(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey, double *d_Ez, dim3 dimGrid, dim3 dimBlockOne){
+  Cell *c0 = cells[0], nc;
+  double t, ex, ey, ez;
+
+  for (i=0; i<dimGrid; i++){
+    for (j=0; j<dimGrid; j++){
+      for (h=0; h<dimGrid; h++){
+        uint3 val(i,j,h);
+        int n = c0-> getGlobalCellNumber(val.x, val.y, val.z);
+        ex = d_Ex[n];
+        ey = d_Ey[n];
+        ez = d_Ez[n];
+
+        t = ex * ex + ey * ey + ez * ez;
+
+        atomicADD_CPU(d_ee, t);
+
+      }
+    }
+  }
 }
 
 void writeAllCurrents_CPU(GPUCell **cells, int n0, double *jx, double *jy, double *jz, double *rho){
@@ -158,7 +176,7 @@ void periodicCurrentElement_CPU(Cell *c, int i, int k, double *E, int dir, int d
 
 }
 
-void periodic_CPU(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from) {
+void periodic_CPU(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from, dim3 dimGrid, dim3 dimBlock) {
 
 }
 

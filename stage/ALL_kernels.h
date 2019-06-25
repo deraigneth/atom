@@ -1,8 +1,8 @@
 
 
-void GPU_getCellEnergy(GPUCell **, double *, double *, double *, double *);
+void GPU_getCellEnergy(GPUCell **, double *, double *, double *, double *, dim3, dim3);
 
-void GPU_SetAllCurrentsToZero(GPUCell **);
+void GPU_SetAllCurrentsToZero(GPUCell **, dim3, dim3);
 
 void GPU_WriteControlSystem(Cell **);
 
@@ -24,7 +24,7 @@ double cuda_atomicAdd(double *, double ) ;
 
 void GPU_SetFieldsToCells(GPUCell **, double *, double *, double *, double *, double *, double *);
 
-void GPU_MakeDepartureLists(GPUCell **, int *) ;
+void GPU_MakeDepartureLists(GPUCell **, int *, dim3, dim3) ;
 
 void copyCellDouble(CellDouble *, CellDouble *, unsigned int);
 
@@ -56,7 +56,7 @@ void copyFromSharedMemoryToCell(
         int
 );
 
-void GPU_periodic(GPUCell **, int, int, double *, int, int, int);
+void GPU_periodic(GPUCell **, int, int, double *, int, int, int, dim3, dim3);
 
 void emh2_Element(Cell *, int , int , int , double *, double *);
 

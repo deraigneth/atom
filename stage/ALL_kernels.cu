@@ -2,12 +2,12 @@
 
 #ifdef __CUDACC__
 
-void GPU_SetAllCurrentsToZero(GPUCell **cells){
+void GPU_SetAllCurrentsToZero(GPUCell **cells, dim3 dimGrid, dim3 dimBlockExt){
   SetAllCurrentsToZero_GPU( **cells);
 }
 #else
-void GPU_SetAllCurrentsToZero(GPUCell **cells){
-   SetAllCurrentsToZero_CPU( **cells);
+void GPU_SetAllCurrentsToZero(GPUCell **cells, dim3 dimGrid, dim3 dimBlockExt){
+   SetAllCurrentsToZero_CPU( **cells, dimGrid, dimBlockExt);
 }
 #endif
 
@@ -106,12 +106,12 @@ double cuda_atomicAdd(double *address, double val) {
 
 
 #ifdef __CUDACC__
-void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey, double *d_Ez){
+void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey, double *d_Ez, dim3 dimGrid, dim3 dimBlockOne){
   getCellEnergy_GPU( **cells,  *d_ee,  *d_Ex,  *d_Ey,  *d_Ez);
 }
 #else
-void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey, double *d_Ez){
-  getCellEnergy_CPU( **cells,  *d_ee,  *d_Ex,  *d_Ey,  *d_Ez);
+void GPU_getCellEnergy(GPUCell **cells, double *d_ee, double *d_Ex, double *d_Ey, double *d_Ez, dim3 dimGrid, dim3 dimBlockOne){
+  getCellEnergy_CPU( **cells,  *d_ee,  *d_Ex,  *d_Ey,  *d_Ez, dimGrid, dimBlockOne);
 }
 #endif
 
@@ -214,12 +214,12 @@ void GPU_SetFieldsToCells(GPUCell **cells, double *Ex, double *Ey, double *Ez, d
 #endif
 
 #ifdef __CUDACC__
-void GPU_MakeDepartureLists(GPUCell **cells, int *d_stage){
+void GPU_MakeDepartureLists(GPUCell **cells, int *d_stage, dim3 dimGrid, dim3 dimBlockOne){
   MakeDepartureLists_GPU( **cells,  *d_stage) ;
 }
 #else
-void GPU_MakeDepartureLists(GPUCell **cells, int *d_stage){
-  MakeDepartureLists_CPU( **cells,  *d_stage);
+void GPU_MakeDepartureLists(GPUCell **cells, int *d_stage, dim3 dimGrid, dim dimBlockOne){
+  MakeDepartureLists_CPU( **cells,  *d_stage, dimGrid, dimBlockOne);
 }
 #endif
 
@@ -360,11 +360,11 @@ void  GPU_eme(GPUCell **cells, int3 s, double *E, double *H1, double *H2, double
 #endif
 
 #ifdef __CUDACC__
-void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from){
+void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from, dim3 dimGrid, dim3 dimBlock){
   periodic_GPU( **cells,  i_s,  k_s,  *E,  dir,  to,from);
 }
 #else
-void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from){
-  periodic_CPU( **cells,  i_s,  k_s,  *E,  dir,  to,from);
+void GPU_periodic(GPUCell **cells, int i_s, int k_s, double *E, int dir, int to, int from, dim3 dimGrid, dim3 dimBlock){
+  periodic_CPU( **cells,  i_s,  k_s,  *E,  dir,  to, from, dimGrid, dimBlock);
 }
 #endif
