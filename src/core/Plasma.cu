@@ -2,8 +2,6 @@
 // Created by egor on 19.02.19.
 //
 
-// cudaLaunchKernel(kernel<type>, grid.x, grid.y, grid.z, block.x, block.y, block.z, arg, shared, stream);
-
 #include "../../include/Plasma.h"
 
 Plasma::Plasma(PlasmaConfig *p) {

@@ -34,9 +34,11 @@ GPUCell *GPUCell::copyCellToDevice() {
     h_src->d_ctrlParticles = Cell::d_ctrlParticles;
     h_src->busyParticleArray = Cell::busyParticleArray;
 
-    err = cudaMalloc((void **) &(h_src->doubParticleArray), sizeof(Particle) * MAX_particles_per_cell);
+    // err = cudaMalloc((void **) &(h_src->doubParticleArray), sizeof(Particle) * MAX_particles_per_cell);
+    err = MemoryAllocate((void **) &(h_src->doubParticleArray), sizeof(Particle) * MAX_particles_per_cell);
     CHECK_ERROR("", err);
-    err = cudaMemset((void **) h_src->doubParticleArray, 0, sizeof(Particle) * MAX_particles_per_cell);
+    // err = cudaMemset((void **) h_src->doubParticleArray, 0, sizeof(Particle) * MAX_particles_per_cell);
+    err = MemorySet((void **) h_src->doubParticleArray, 0, sizeof(Particle) * MAX_particles_per_cell);
     CHECK_ERROR("", err);
 
     err = MemoryCopy(h_src->doubParticleArray, Cell::doubParticleArray, sizeof(Particle) * MAX_particles_per_cell, HOST_TO_DEVICE);
@@ -84,7 +86,8 @@ GPUCell *GPUCell::copyCellToDevice() {
     err = MemoryCopy(h_src->Hx, Cell::Hx, sizeof(CellDouble), HOST_TO_DEVICE);
     CHECK_ERROR("", err);
 
-    err = cudaMalloc((void **) &(h_src->Hy), sizeof(CellDouble));
+    // err = cudaMalloc((void **) &(h_src->Hy), sizeof(CellDouble));
+    err = MemoryAllocate((void **) &(h_src->Hy), sizeof(CellDouble));
     CHECK_ERROR("", err);
 
     err = MemoryCopy(h_src->Hy, Cell::Hy, sizeof(CellDouble), HOST_TO_DEVICE);
@@ -121,10 +124,10 @@ void GPUCell::copyCellFromDevice(GPUCell *d_src, GPUCell *h_dst) {
         h_copy_of_d_src = new GPUCell;
         h_copy_of_d_src->Init();
     }
-
+    #ifdef __CUDACC__
     err = cudaThreadSynchronize();
     CHECK_ERROR("Thread synchronize", err);
-
+    #endif
     err = MemoryCopy(h_copy_of_d_src, d_src, sizeof(GPUCell), DEVICE_TO_HOST);
     CHECK_ERROR("copyCellFromDevice1", err);
 
