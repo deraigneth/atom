@@ -2,7 +2,7 @@
 
 void SetAllCurrentsToZero_CPU(GPUCell **, dim3, dim3);
 
-void WriteControlSystem_CPU(Cell **);
+void WriteControlSystem_CPU(Cell **, dim3, dim3);
 
 void writeCurrentComponent_CPU(CellDouble *, CurrentTensorComponent *, CurrentTensorComponent *, int );
 

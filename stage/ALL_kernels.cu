@@ -12,12 +12,12 @@ void GPU_SetAllCurrentsToZero(GPUCell **cells, dim3 dimGrid, dim3 dimBlockExt){
 #endif
 
 #ifdef __CUDACC__
-void GPU_WriteControlSystem(Cell **cells){
+void GPU_WriteControlSystem(Cell **cells, dim3 dimGrid, dim3 dimBlock){
   WriteControlSystem_GPU( **cells);
 }
 #else
-void GPU_WriteControlSystem(Cell **cells){
-  WriteControlSystem_CPU( **cells);
+void GPU_WriteControlSystem(Cell **cells,dim3 dimGrid, dim3 dimBlock){
+  WriteControlSystem_CPU( **cells, dimGrid, dimBlock);
 }
 #endif
 
@@ -164,7 +164,8 @@ void copyFromSharedMemoryToCell(
         CellDouble *c_jy,
         CellDouble *c_jz,
         Cell *c,
-        int index
+        int index,
+        dim3 dimGrid
 ){
   copyFromSharedMemoryToCell_GPU( *c_jx,  *c_jy,  *c_jz,  *c,  index);
 }
@@ -174,9 +175,10 @@ void copyFromSharedMemoryToCell(
         CellDouble *c_jy,
         CellDouble *c_jz,
         Cell *c,
-        int index
+        int index,
+        dim3 dimGrid
 ){
-  copyFromSharedMemoryToCell_CPU( *c_jx,  *c_jy,  *c_jz,  *c,  index);
+  copyFromSharedMemoryToCell_CPU( *c_jx,  *c_jy,  *c_jz,  *c,  index, dimGrid);
 }
 #endif
 

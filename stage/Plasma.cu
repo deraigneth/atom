@@ -116,10 +116,11 @@ void Plasma::emeGPUIterate(int3 s, int3 f, double *E, double *H1, double *H2, do
                     (void *) &tau,
                     (void *) &d1,
                     (void *) &d2,
-
+#ifndef __CUDACC__
 
                     (void*) &dimGrid,
                     (void*) &dimBlock,
+#endif
                     0};
 
     // int cudaStatus = cudaLaunchKernel(
@@ -280,9 +281,10 @@ double Plasma::getElectricEnergy() {
                     (void *) &pd->d_Ex,
                     (void *) &pd->d_Ey,
                     (void *) &pd->d_Ez,
-
+#ifndef __CUDACC__
                     (void *) &dimGrid,
                     (void *) &dimBlockOne,
+#endif
                     0};
 
                     // int cudaStatus = cudaLaunchKernel(
@@ -366,9 +368,10 @@ int Plasma::MagneticFieldTrace(double *Q, double *H, double *E1, double *E2, int
                     (void *) &d1,
                     (void *) &d2,
 
-
+#ifndef __CUDACC__
                     (void *) &dimGrid,
                     (void *) &dimBlock,
+#endif
                     0};
 
 
@@ -414,10 +417,10 @@ int Plasma::SimpleMagneticFieldTrace(Cell &c, double *Q, double *H, int i_end, i
                     (void *) &k_s,
                     (void *) &Q,
                     (void *) &H,
-
-
+#ifndef __CUDACC__
                     (void *) &dimGrid,
                     (void *) &dimBlock,
+#endif
                     0};
 
     // int cudaStatus = cudaLaunchKernel(
@@ -460,9 +463,10 @@ int Plasma::PeriodicBoundaries(double *E, int dir, int start1, int end1, int sta
                     (void *) &dir,
                     (void *) &zero,
                     (void *) &N,
-
+#ifndef __CUDACC__
                     (void *) &dimGrid,
                     (void *) &dimBlock,
+#endif
                     0};
 
 
@@ -502,9 +506,10 @@ int Plasma::PeriodicBoundaries(double *E, int dir, int start1, int end1, int sta
                      (void *) &dir,
                      (void *) &N1,
                      (void *) &one,
-
+#ifndef __CUDACC__
                      (void *) &dimGrid,
                      (void *) &dimBlock,
+#endif
                      0};
 
                      // cudaStatus = cudaLaunchKernel(
@@ -552,9 +557,10 @@ int Plasma::SetPeriodicCurrentComponent(GPUCell **cells, double *J, int dir, uns
                     (void *) &k_s,
                     (void *) &N,
 
-
+#ifndef __CUDACC__
                     (void *) &dimGridX,
                     (void *) &dimBlock,
+#endif
                     0};
 
     // int cudaStatus = cudaLaunchKernel(
@@ -588,8 +594,10 @@ int Plasma::SetPeriodicCurrentComponent(GPUCell **cells, double *J, int dir, uns
                     (void *) &i_s,
                     (void *) &k_s,
                     (void *) &N,
+#ifndef __CUDACC__
                     (void *) &dimGridY,
                     (void *) &dimBlock,
+#endif
                     0};
 
     // cudaStatus = cudaLaunchKernel(
@@ -624,8 +632,10 @@ int Plasma::SetPeriodicCurrentComponent(GPUCell **cells, double *J, int dir, uns
                     (void *) &i_s,
                     (void *) &k_s,
                     (void *) &N,
+#ifndef __CUDACC__
                     (void *) &dimGridZ,
                     (void *) &dimBlock,
+#endif
                     0};
 
     // cudaStatus = cudaLaunchKernel(
@@ -700,8 +710,10 @@ void Plasma::AssignCellsToArraysGPU() {
                     (void *) &pd->d_Hx,
                     (void *) &pd->d_Hy,
                     (void *) &pd->d_Hz,
+#ifndef __CUDACC__
                     (void *) &dimGrid,
                     (void *) &dimBlockExt,
+#endif
                     0};
     // err = cudaLaunchKernel(
     //         (const void *) GPU_SetFieldsToCells, // pointer to kernel func.
@@ -856,8 +868,10 @@ int Plasma::SetCurrentsInCellsToZero() {
 
 <<<<<<< HEAD
     void *args[] = {(void *) &pd->d_CellArray,
+#ifndef __CUDACC__
                     (void *) &dimGrid,
                     (void *) &dimBlockExt,
+#endif
                      0};
 
     // int err = cudaLaunchKernel(
@@ -901,7 +915,11 @@ int Plasma::StepAllCells() {
 
     std::cout << "begin step" << std::endl;
 
-    void *args[] = {(void *) &pd->d_CellArray, (void *) &dimGrid, (void *) &dimBlock,  0};
+    void *args[] = {(void *) &pd->d_CellArray,
+#ifndef __CUDACC__
+                    (void *) &dimGrid, (void *) &dimBlock,
+#endif
+                      0};
 
     // err = cudaLaunchKernel(
     //         (const void *) GPU_StepAllCells, // pointer to kernel func.
@@ -925,7 +943,11 @@ int Plasma::StepAllCells() {
 /////// NEED CHECK HERE
     CHECK_ERROR("GPU_StepAllCells", err);
 
-    void *args1[] = {(void *) &pd->d_CellArray, (void *) &dimGrid, (void *) &dimBlock, 0};
+    void *args1[] = {(void *) &pd->d_CellArray,
+#ifndef __CUDACC__
+                    (void *) &dimGrid, (void *) &dimBlock,
+#endif
+                    0};
     #ifdef __CUDACC__
     err = cudaFuncSetCacheConfig((const void *) GPU_CurrentsAllCells, cudaFuncCachePreferShared);
     CHECK_ERROR("cudaFuncSetCacheConfig", err);
@@ -978,9 +1000,10 @@ int Plasma::WriteCurrentsFromCellsToArrays() {
                     (void *) &pd->d_Jz,
                     (void *) &pd->d_Rho,
 
-
+#ifndef __CUDACC__
                     (void *) &dimGrid ,
                     (void *) &dimExt,
+#endif
                     0};
 
     // cudaLaunchKernel(
@@ -1028,9 +1051,10 @@ int Plasma::MakeParticleList(int *stage, int **d_stage, int **d_stage1) {
     void *args[] = {
             (void *) &pd->d_CellArray,
             (void *) d_stage,
-
+#ifndef __CUDACC__
             (void *) dimGrid,
             (void *) dimBlockOne,
+#endif
             0};
 
             // err = cudaLaunchKernel(
@@ -1081,9 +1105,10 @@ int Plasma::reallyPassParticlesToAnotherCells(int *stage1, int *d_stage1) {
     void *args[] = {
             (void *) &pd->d_CellArray,
             (void *) &d_stage1,
-
+#ifndef __CUDACC__
             (void *) &dimGridBulk,
             (void *) &dimBlockOne,
+#endif
             0};
 
 

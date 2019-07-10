@@ -21,7 +21,7 @@ void read3Darray(std::string name, double *d);
 
 int setPrintfLimit();
 
-void cudaMalloc3D(double **X, double **Y, double **Z, int nx, int ny, int nz);
+void Malloc3D(double **X, double **Y, double **Z, int nx, int ny, int nz);
 
 void InitGPUFields(
         double **d_Ex, double **d_Ey, double **d_Ez,

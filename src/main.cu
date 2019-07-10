@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         // Ici, on a réussi à ouvrir le fichier entré en paramètre dans la ligne de commande d'exécution
 
         InitMPI(argc, argv);
-        // ON initialise le MPI 
+        // ON initialise le MPI
 
         cout << "begin Particle size " <<  sizeof(Particle) << endl;
 

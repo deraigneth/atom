@@ -4,7 +4,7 @@ void GPU_getCellEnergy(GPUCell **, double *, double *, double *, double *, dim3,
 
 void GPU_SetAllCurrentsToZero(GPUCell **, dim3, dim3);
 
-void GPU_WriteControlSystem(Cell **);
+void GPU_WriteControlSystem(Cell **,dim3, dim3);
 
 void writeCurrentComponent(CellDouble *, CurrentTensorComponent *, CurrentTensorComponent *, int );
 

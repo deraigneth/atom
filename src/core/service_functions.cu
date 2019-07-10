@@ -4,19 +4,20 @@ using namespace std;
 
 int setPrintfLimit() {
     size_t sizeP;
+    #ifdef __CUDACC__
+      std::cout << "Particle size " << sizeof(Particle) << " : " << sizeof(Particle) / sizeof(double) << ". CurrentTensor " << (int)sizeof(CurrentTensor) << " short " << (int)sizeof(char) << std::endl;
 
-    std::cout << "Particle size " << sizeof(Particle) << " : " << sizeof(Particle) / sizeof(double) << ". CurrentTensor " << (int)sizeof(CurrentTensor) << " short " << (int)sizeof(char) << std::endl;
+      cudaDeviceGetLimit(&sizeP, cudaLimitPrintfFifoSize);
 
-    cudaDeviceGetLimit(&sizeP, cudaLimitPrintfFifoSize);
+      std::cout << "print default limit " << sizeP / 1024 / 1024 << std::endl;
 
-    std::cout << "print default limit " << sizeP / 1024 / 1024 << std::endl;
+      sizeP *= 10000;
+      cudaDeviceSetLimit(cudaLimitPrintfFifoSize, sizeP);
 
-    sizeP *= 10000;
-    cudaDeviceSetLimit(cudaLimitPrintfFifoSize, sizeP);
+      cudaDeviceGetLimit(&sizeP, cudaLimitPrintfFifoSize);
 
-    cudaDeviceGetLimit(&sizeP, cudaLimitPrintfFifoSize);
-
-    std::cout << "print limit set to " << sizeP / 1024 / 1024 << std::endl;
+      std::cout << "print limit set to " << sizeP / 1024 / 1024 << std::endl;
+    #endif
 
     return 0;
 }
@@ -31,13 +32,13 @@ double CheckArraySilent(double *a, double *dbg_a, int size) {
     return pow(diff / (size), 0.5);
 }
 
-void cudaMalloc3D(double **X, double **Y, double **Z, int nx, int ny, int nz) {
+void Malloc3D(double **X, double **Y, double **Z, int nx, int ny, int nz) {
     int err;
-    err = cudaMalloc((void **) X, sizeof(double) * (nx + 2) * (ny + 2) * (nz + 2));
+    err = MemoryAllocate((void **) X, sizeof(double) * (nx + 2) * (ny + 2) * (nz + 2));
     CHECK_ERROR("CUDA MALLOC", err);
-    err = cudaMalloc((void **) Y, sizeof(double) * (nx + 2) * (ny + 2) * (nz + 2));
+    err = MemoryAllocate((void **) Y, sizeof(double) * (nx + 2) * (ny + 2) * (nz + 2));
     CHECK_ERROR("CUDA MALLOC", err);
-    err = cudaMalloc((void **) Z, sizeof(double) * (nx + 2) * (ny + 2) * (nz + 2));
+    err = MemoryAllocate((void **) Z, sizeof(double) * (nx + 2) * (ny + 2) * (nz + 2));
     CHECK_ERROR("CUDA MALLOC", err);
 }
 
@@ -115,11 +116,11 @@ void InitGPUFields(
         double *Qx, double *Qy, double *Qz,
         int Nx, int Ny, int Nz
 ) {
-    cudaMalloc3D(d_Ex, d_Ey, d_Ez, Nx, Ny, Nz);
-    cudaMalloc3D(d_Hx, d_Hy, d_Hz, Nx, Ny, Nz);
-    cudaMalloc3D(d_Jx, d_Jy, d_Jz, Nx, Ny, Nz);
-    cudaMalloc3D(d_npJx, d_npJy, d_npJz, Nx, Ny, Nz);
-    cudaMalloc3D(d_Qx, d_Qy, d_Qz, Nx, Ny, Nz);
+    Malloc3D(d_Ex, d_Ey, d_Ez, Nx, Ny, Nz);
+    Malloc3D(d_Hx, d_Hy, d_Hz, Nx, Ny, Nz);
+    Malloc3D(d_Jx, d_Jy, d_Jz, Nx, Ny, Nz);
+    Malloc3D(d_npJx, d_npJy, d_npJz, Nx, Ny, Nz);
+    Malloc3D(d_Qx, d_Qy, d_Qz, Nx, Ny, Nz);
 
     copyFieldsToGPU(
             *d_Ex, *d_Ey, *d_Ez,
@@ -135,5 +136,3 @@ void InitGPUFields(
             Nx, Ny, Nz
     );
 }
-
-
